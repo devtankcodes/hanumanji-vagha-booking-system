@@ -1,0 +1,13 @@
+{
+  "name": "hanumanji-vagha-booking-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static server for the Hanumanji Vagha Booking System frontend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

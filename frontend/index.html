@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagha Management System</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <h1>🙏 Vagha Management</h1>
+
+  <div class="card">
+    <h2>Add Devotee</h2>
+    <form id="bookingForm" novalidate>
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" placeholder="Full name" autocomplete="name" required>
+
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" value="+91 " name="phone" inputmode="numeric" placeholder="10-digit mobile number" maxlength="10" required>
+
+      <label for="dayType">Day Type</label>
+      <select id="dayType" name="dayType">
+        <option value="Friday" selected>Friday</option>
+        <option value="Special">Special Day</option>
+      </select>
+
+      <button type="submit" id="addBtn">Add Devotee</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Confirmed List <span class="count" id="confirmedCount">0</span></h2>
+    <ul id="confirmedList"><li class="empty-state">No confirmed bookings yet.</li></ul>
+  </div>
+
+  <div class="card">
+    <h2>Waiting List <span class="count" id="waitingCount">0</span></h2>
+    <ul id="waitingList"><li class="empty-state">No one is waiting right now.</li></ul>
+  </div>
+
+  <div class="card">
+    <h2>Calendar View</h2>
+    <div id="calendar"></div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <h3 id="modalTitle">Select Date</h3>
+      <p class="modal-hint" id="modalSuggestion"></p>
+      <label for="modalDate">Vagha date</label>
+      <input type="date" id="modalDate">
+      <div class="modal-actions">
+        <button type="button" id="confirmDateBtn">Confirm Booking</button>
+        <button type="button" id="cancelDateBtn" class="secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

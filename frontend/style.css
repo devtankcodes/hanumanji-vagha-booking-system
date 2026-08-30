@@ -1,0 +1,292 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --saffron: #f59e0b;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --radius: 12px;
+}
+
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  margin: 0;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--ink);
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+h1 {
+  text-align: center;
+  margin: 8px 0 20px;
+  font-size: 24px;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count {
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.card {
+  background: var(--card);
+  padding: 18px;
+  margin: 12px 0;
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 4px 0 0;
+  font-size: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+}
+
+input:focus, select:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+input.invalid {
+  border-color: var(--red);
+}
+
+.field-error {
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 4px;
+  min-height: 16px;
+}
+
+#addBtn {
+  margin-top: 16px;
+  width: 100%;
+  background: var(--saffron);
+  color: white;
+  padding: 12px;
+  font-size: 15px;
+}
+
+.entry {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.entry-info strong {
+  display: block;
+  font-size: 15px;
+}
+
+.entry-info p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.entry-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.empty-state {
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+button {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: transform 0.15s, filter 0.15s;
+}
+
+button:hover {
+  filter: brightness(0.95);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background: #e5e7eb;
+  color: var(--ink);
+}
+
+.whatsapp-btn {
+  background: var(--green);
+  color: white;
+}
+
+.assign-btn {
+  background: var(--saffron);
+  color: white;
+}
+
+.delete-btn {
+  background: var(--red);
+  color: white;
+}
+
+#calendar {
+  font-size: 13px;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+}
+
+.modal-hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+/* Toasts */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: toast-in 0.2s ease-out;
+}
+
+.toast.error {
+  background: var(--red);
+}
+
+.toast.success {
+  background: var(--green);
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Confirm dialog */
+.confirm-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: 20px;
+}
+
+.confirm-box {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+}
+
+.confirm-box p {
+  margin-top: 0;
+}
+
+.confirm-box .modal-actions {
+  margin-top: 12px;
+}
