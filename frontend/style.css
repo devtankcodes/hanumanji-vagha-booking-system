@@ -14,6 +14,10 @@
   --radius: 12px;
 }
 
+html {
+  color-scheme: light;
+}
+
 body {
   font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   margin: 0;
@@ -89,6 +93,41 @@ input:focus, select:focus {
 
 input.invalid {
   border-color: var(--red);
+}
+
+/* Phone field with fixed +91 prefix */
+.phone-field {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.phone-field:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.phone-prefix {
+  padding: 12px 0 12px 12px;
+  font-size: 16px;
+  color: black;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.phone-field input {
+  border: none;
+  margin: 0;
+  flex: 1;
+  padding: 12px 12px 12px 6px;
+}
+
+.phone-field input:focus {
+  outline: none;
 }
 
 .field-error {
@@ -187,6 +226,33 @@ button:disabled {
 
 #calendar {
   font-size: 13px;
+}
+
+/* Next-available-Friday highlight on the calendar */
+.next-friday-cell {
+  position: relative;
+}
+
+.next-friday-cell .fc-daygrid-day-number {
+  font-weight: 700;
+  color: #b45309;
+}
+
+.next-friday-cell::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+}
+
+/* Highlight the soonest upcoming confirmed booking */
+.entry-next {
+  background: #ecfdf5;
+  border: 1.5px solid var(--blue);
 }
 
 /* Modal */

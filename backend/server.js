@@ -15,7 +15,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..", "frontend")));
+// index.html lives at the project root (needed for GitHub Pages), so serve
+// the root, not the frontend/ subfolder — its own links (frontend/style.css,
+// frontend/js/main.js) resolve correctly relative to that root.
+app.use(express.static(path.join(__dirname, "..")));
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
