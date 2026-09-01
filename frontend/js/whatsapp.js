@@ -1,13 +1,23 @@
 export function getWhatsAppLink(booking) {
-  const phone = `91${booking.phone}`; // India country code + 10-digit number
+  const phone = `91${booking.phone}`;
 
-  const msg = `🙏 Jai Siyaram
+  const formattedDate = new Date(booking.date).toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
 
-Your Vagha booking is confirmed.
-📅 Date: ${booking.date}
-📌 Day: ${booking.dayType}
+  const msg = `🙏 Jai Siyaram, ${booking.name} ji
 
-Thank you 🙏`;
+Your Vagha booking at Shree Hanumanji Mandir is confirmed.
+
+📅 Date: ${formattedDate}
+🕉️ Occasion: ${booking.dayType === "Friday" ? "Weekly Friday Vagha" : "Special Day Vagha"}
+
+Please arrive a little before the scheduled time. For any changes, feel free to reply to this message.
+
+Jai Hanuman 🙏`;
 
   return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
 }

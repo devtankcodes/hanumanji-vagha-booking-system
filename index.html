@@ -12,7 +12,10 @@
 
 <body>
 
-    <h1>Vagha Management</h1>
+    <header class="app-header">
+        <img src="frontend/assets/logo.png" alt="Shree Chamatkarik Hanumanji Mandir logo" class="app-logo" onerror="this.style.display='none'">
+        <h1>Vagha Management</h1>
+    </header>
 
     <div class="card">
         <h2>Add Devotee</h2>
@@ -69,6 +72,35 @@
             <div class="modal-actions">
                 <button type="button" id="confirmDateBtn">Confirm Booking</button>
                 <button type="button" id="cancelDateBtn" class="secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+        <div class="modal-content">
+            <h3 id="editModalTitle">Edit Devotee</h3>
+
+            <label for="editName">Name</label>
+            <input type="text" id="editName" autocomplete="name">
+            <p class="field-error" id="editNameError"></p>
+
+            <label for="editPhone">Phone</label>
+            <div class="phone-field">
+                <span class="phone-prefix">+91</span>
+                <input type="tel" id="editPhone" inputmode="numeric" maxlength="10">
+            </div>
+            <p class="field-error" id="editPhoneError"></p>
+
+            <label for="editDayType">Day Type</label>
+            <select id="editDayType">
+                <option value="Friday">Friday</option>
+                <option value="Special">Special Day</option>
+            </select>
+
+            <div class="modal-actions">
+                <button type="button" id="saveEditBtn">Save Changes</button>
+                <button type="button" id="cancelEditBtn" class="secondary">Cancel</button>
             </div>
         </div>
     </div>

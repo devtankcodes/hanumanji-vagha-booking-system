@@ -1,5 +1,6 @@
 import { getBookings } from "./state.js";
 import { getWhatsAppLink } from "./whatsapp.js";
+import { formatDateDisplay } from "./service.js";
 
 function getNextUpcomingId(confirmed) {
   const today = new Date().toISOString().split("T")[0];
@@ -21,7 +22,7 @@ function buildEntry(item, { showDate, actions, highlight }) {
 
   const meta = document.createElement("p");
   meta.textContent = showDate
-    ? `${item.date} • ${item.dayType}`
+    ? `${formatDateDisplay(item.date)} • ${item.dayType}`
     : `${item.phone} • ${item.dayType}`;
 
   info.append(name, meta);
@@ -43,7 +44,7 @@ function makeButton(label, className, onClick) {
   return btn;
 }
 
-export function render({ onAssign, onDelete }) {
+export function render({ onAssign, onDelete, onEdit }) {
   const waitingContainer = document.getElementById("waitingList");
   const confirmedContainer = document.getElementById("confirmedList");
   const waitingCount = document.getElementById("waitingCount");
@@ -70,6 +71,7 @@ export function render({ onAssign, onDelete }) {
       showDate: false,
       highlight: false,
       actions: [
+        makeButton("Edit", "edit-btn", () => onEdit(item.id)),
         makeButton("Assign", "assign-btn", () => onAssign(item.id)),
         makeButton("Delete", "delete-btn", () => onDelete(item.id))
       ]
@@ -87,6 +89,7 @@ export function render({ onAssign, onDelete }) {
       highlight: item.id === nextUpcomingId,
       actions: [
         makeButton("WhatsApp", "whatsapp-btn", () => window.open(getWhatsAppLink(item), "_blank")),
+        makeButton("Reassign", "assign-btn", () => onAssign(item.id)),
         makeButton("Delete", "delete-btn", () => onDelete(item.id))
       ]
     }));

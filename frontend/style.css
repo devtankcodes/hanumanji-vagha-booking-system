@@ -28,9 +28,25 @@ body {
   margin-inline: auto;
 }
 
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px 0 20px;
+}
+
+.app-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
 h1 {
   text-align: center;
-  margin: 8px 0 20px;
+  margin: 0;
   font-size: 24px;
 }
 
@@ -224,8 +240,118 @@ button:disabled {
   color: white;
 }
 
+.edit-btn {
+  background: var(--blue);
+  color: white;
+}
+
+/* ============ Calendar (FullCalendar) ============ */
+
 #calendar {
   font-size: 13px;
+  margin-top: 25px;
+}
+
+/* Header toolbar: nav buttons + month title */
+.fc .fc-toolbar-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.fc .fc-button-primary {
+  background: var(--ink);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  box-shadow: none;
+}
+
+.fc .fc-button-primary:hover,
+.fc .fc-button-primary:focus {
+  background: #111827;
+  box-shadow: none;
+}
+
+.fc .fc-button-primary:disabled {
+  background: #9ca3af;
+}
+
+/* Grid + borders */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #e5e7eb;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border-color: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Weekday header row (Sun, Mon, ...) */
+.fc .fc-col-header-cell {
+  background: #f9fafb;
+  padding: 8px 0;
+}
+
+.fc .fc-col-header-cell-cushion {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* Day cells */
+.fc .fc-daygrid-day-frame {
+  padding: 4px;
+  height: 70px;
+}
+
+.fc .fc-daygrid-day-number {
+  padding: 4px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.fc .fc-day-other .fc-daygrid-day-number {
+  color: #cbd5e1;
+}
+
+/* Today: subtle tint instead of FullCalendar's default bright yellow */
+.fc .fc-day-today {
+  background: #eff6ff !important;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+/* Confirmed-booking events: quiet pill instead of a solid color block */
+.fc-daygrid-event {
+  border: none;
+  border-radius: 6px;
+  padding: 2px 4px;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  white-space: normal;
+  word-break: break-word;
+}
+
+.fc-daygrid-event .fc-event-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
 }
 
 /* Next-available-Friday highlight on the calendar */
@@ -241,8 +367,8 @@ button:disabled {
 .next-friday-cell::after {
   content: "";
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 6px;
+  right: 6px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -251,7 +377,7 @@ button:disabled {
 
 /* Highlight the soonest upcoming confirmed booking */
 .entry-next {
-  background: #ecfdf5;
+  background: #eff6ff;
   border: 1.5px solid var(--blue);
 }
 

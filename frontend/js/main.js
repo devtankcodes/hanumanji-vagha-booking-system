@@ -1,9 +1,10 @@
 import { addBooking, deleteBooking } from "./service.js";
 import { getBookings } from "./state.js";
 import { render } from "./ui.js";
-import { isValidName, isValidPhone, cleanPhoneInput } from "./validators.js";
+import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput } from "./validators.js";
 import { showToast, confirmDialog } from "./notifications.js";
 import { initModal, openModal } from "./modal.js";
+import { initEditModal, openEditModal } from "./edit-modal.js";
 import { initCalendar, refreshCalendar } from "./calendar.js";
 
 const form = document.getElementById("bookingForm");
@@ -14,7 +15,7 @@ const nameError = document.getElementById("nameError");
 const phoneError = document.getElementById("phoneError");
 
 function refresh() {
-  render({ onAssign: handleAssign, onDelete: handleDelete });
+  render({ onAssign: handleAssign, onDelete: handleDelete, onEdit: handleEdit });
   refreshCalendar();
 }
 
@@ -39,10 +40,16 @@ function handleSubmit(e) {
   let hasError = false;
 
   if (!name) {
-    setFieldError(nameInput, nameError, "Name is required.");
+    setFieldError(nameInput, nameError, "Enter full name.");
     hasError = true;
-  } else if (!isValidName(name)) {
+  } else if (!hasOnlyLetterCharacters(name)) {
     setFieldError(nameInput, nameError, "Name should contain only letters and spaces.");
+    hasError = true;
+  } else if (!isNameLongEnough(name)) {
+    setFieldError(nameInput, nameError, "Enter full name (at least 2 characters).");
+    hasError = true;
+  } else if (name.length > 60) {
+    setFieldError(nameInput, nameError, "Name is too long.");
     hasError = true;
   }
 
@@ -71,6 +78,10 @@ function handleAssign(id) {
   openModal(id);
 }
 
+function handleEdit(id) {
+  openEditModal(id);
+}
+
 async function handleDelete(id) {
   const booking = getBookings().find(b => b.id === id);
   const label = booking ? booking.name : "this devotee";
@@ -95,5 +106,6 @@ nameInput.addEventListener("input", () => {
 form.addEventListener("submit", handleSubmit);
 
 initModal({ onSuccess: refresh });
+initEditModal({ onSuccess: refresh });
 initCalendar();
 refresh();

@@ -1,4 +1,4 @@
-import { assignBooking, getNextAvailableFriday, isDateFull } from "./service.js";
+import { assignBooking, getNextAvailableFriday, isDateFull, getTodayLocal, formatDateDisplay } from "./service.js";
 import { getBookings } from "./state.js";
 import { showToast } from "./notifications.js";
 
@@ -26,7 +26,6 @@ export function initModal({ onSuccess }) {
 }
 
 function isFriday(dateStr) {
-  // Parse as local date, not UTC, to avoid off-by-one day issues.
   const [y, m, d] = dateStr.split("-").map(Number);
   return new Date(y, m - 1, d).getDay() === 5;
 }
@@ -38,7 +37,7 @@ function validateDateChoice() {
   if (!date) return;
 
   if (selectedDayType === "Friday" && !isFriday(date)) {
-    dateErrorEl().textContent = "This devotee is registered for Friday — please pick a Friday date.";
+    dateErrorEl().textContent = "This devotee is registered for Friday - please pick a Friday date.";
   }
 }
 
@@ -47,17 +46,28 @@ export function openModal(id) {
 
   const booking = getBookings().find(b => b.id === id);
   selectedDayType = booking ? booking.dayType : null;
+  const isReassign = booking && booking.status === "confirmed";
 
   const suggestion = selectedDayType === "Friday" ? getNextAvailableFriday() : null;
-  dateInput().value = suggestion || "";
-  dateInput().min = new Date().toISOString().split("T")[0];
+
+  dateInput().value = isReassign ? booking.date : (suggestion || "");
+  dateInput().min = getTodayLocal();
   dateErrorEl().textContent = "";
 
-  suggestionEl().textContent = suggestion
-    ? `Suggested next available Friday: ${suggestion}`
-    : selectedDayType === "Friday"
-      ? "No suggestion available — please choose a Friday manually."
-      : "Choose the confirmed date for this special-day booking.";
+  document.getElementById("modalTitle").textContent = isReassign
+    ? "Reassign Date"
+    : "Select Date";
+  document.getElementById("confirmDateBtn").textContent = isReassign
+    ? "Save New Date"
+    : "Confirm Booking";
+
+  suggestionEl().textContent = isReassign
+    ? "Choose a new date for this booking."
+    : suggestion
+      ? `Suggested next available Friday: ${formatDateDisplay(suggestion)}`
+      : selectedDayType === "Friday"
+        ? "No suggestion available — please choose a Friday manually."
+        : "Choose the confirmed date for this special-day booking.";
 
   modal().classList.remove("hidden");
   dateInput().focus();
@@ -82,7 +92,7 @@ function handleConfirm() {
     return;
   }
 
-  if (isDateFull(date)) {
+  if (isDateFull(date, selectedId)) {
     showToast("That date is already fully booked.", "error");
     return;
   }
