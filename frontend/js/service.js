@@ -1,22 +1,42 @@
 import { getBookings, setBookings } from "./state.js";
+import { capitalizeWords } from "./validators.js";
 
 // Max devotees allowed on a single vagha date. Adjust to match real capacity.
 export const MAX_PER_DATE = 1;
 
+/**
+ * Checks whether a phone number is already tied to an active booking.
+ * @param {string} phone - Digits-only phone number (no country code).
+ * @param {number|null} [excludeId] - Booking id to exclude (used when editing that same booking).
+ */
 export function isPhoneAlreadyRegistered(phone, excludeId = null) {
   return getBookings().some(
     b => b.phone === phone && b.status !== "cancelled" && b.id !== excludeId
   );
 }
 
+/**
+ * Checks whether a given date has reached MAX_PER_DATE confirmed bookings.
+ * @param {string} date - YYYY-MM-DD.
+ * @param {number|null} [excludeId] - Booking id to exclude (used when reassigning that same booking).
+ */
 export function isDateFull(date, excludeId = null) {
-  const count = getBookings().filter(
+  return getBookings().filter(
     b => b.status === "confirmed" && b.date === date && b.id !== excludeId
-  ).length;
-  return count >= MAX_PER_DATE;
+  ).length >= MAX_PER_DATE;
 }
 
-export function addBooking({ name, phone, dayType }) {
+/**
+ * Adds a new devotee to the waiting list.
+ * @param {Object} params
+ * @param {string} params.name
+ * @param {string} params.phone - Digits-only, already validated.
+ * @param {string} [params.countryCode="+91"]
+ * @param {"Friday"|"Special"} params.dayType
+ * @throws {Error} If the phone number is already registered on an active booking.
+ * @returns {Object} The newly created booking.
+ */
+export function addBooking({ name, phone, countryCode = "+91", dayType }) {
   if (isPhoneAlreadyRegistered(phone)) {
     throw new Error("This phone number is already registered.");
   }
@@ -24,8 +44,9 @@ export function addBooking({ name, phone, dayType }) {
   const bookings = getBookings();
   const newBooking = {
     id: Date.now(),
-    name: name.trim(),
+    name: capitalizeWords(name.trim()),
     phone: phone.trim(),
+    countryCode,
     dayType,
     status: "waiting",
     date: null,
@@ -36,11 +57,22 @@ export function addBooking({ name, phone, dayType }) {
   return newBooking;
 }
 
-// Updates name/phone/dayType on an existing booking. Day type may only be
-// changed while the booking is still "waiting" — a confirmed booking already
-// has a date tied to its type, so changing type there could leave a Friday
-// date attached to a "Special" booking or vice versa.
-export function updateBooking(id, { name, phone, dayType }) {
+/**
+ * Updates name/phone/countryCode/dayType on an existing booking. Day type
+ * may only be changed while the booking is still "waiting" — a confirmed
+ * booking already has a date tied to its type, so changing type there
+ * could leave a Friday date attached to a "Special" booking or vice versa.
+ *
+ * @param {number} id
+ * @param {Object} params
+ * @param {string} params.name
+ * @param {string} params.phone
+ * @param {string} [params.countryCode]
+ * @param {"Friday"|"Special"} [params.dayType]
+ * @throws {Error} If the phone is already registered elsewhere, or the
+ *   booking is confirmed and a day-type change was attempted.
+ */
+export function updateBooking(id, { name, phone, countryCode, dayType }) {
   if (isPhoneAlreadyRegistered(phone, id)) {
     throw new Error("This phone number is already registered.");
   }
@@ -56,8 +88,9 @@ export function updateBooking(id, { name, phone, dayType }) {
     b.id === id
       ? {
           ...b,
-          name: name.trim(),
+          name: capitalizeWords(name.trim()),
           phone: phone.trim(),
+          ...(countryCode ? { countryCode } : {}),
           ...(b.status === "waiting" && dayType ? { dayType } : {})
         }
       : b
@@ -65,11 +98,38 @@ export function updateBooking(id, { name, phone, dayType }) {
   setBookings(updated);
 }
 
+/** Permanently removes a booking by id. */
 export function deleteBooking(id) {
   const bookings = getBookings();
   setBookings(bookings.filter(b => b.id !== id));
 }
 
+/**
+ * Removes confirmed bookings whose Vagha date has already passed.
+ * Call this once on app startup so completed bookings never linger
+ * in the Confirmed List. Waiting-list entries are untouched since
+ * they have no date yet.
+ */
+export function removeCompletedBookings() {
+  const today = getTodayLocal();
+  const bookings = getBookings();
+  const stillRelevant = bookings.filter(
+    b => !(b.status === "confirmed" && b.date < today)
+  );
+
+  if (stillRelevant.length !== bookings.length) {
+    setBookings(stillRelevant);
+  }
+}
+
+/**
+ * Confirms a booking for a given date, moving it from "waiting" to
+ * "confirmed" (or updating the date on an already-confirmed booking,
+ * i.e. a reassign).
+ * @param {number} id
+ * @param {string} date - YYYY-MM-DD.
+ * @throws {Error} If the date has already reached MAX_PER_DATE.
+ */
 export function assignBooking(id, date) {
   if (isDateFull(date, id)) {
     throw new Error("That date is already fully booked. Please pick another.");
@@ -82,7 +142,12 @@ export function assignBooking(id, date) {
   setBookings(updated);
 }
 
-// Suggests the next Friday that isn't already fully booked.
+/**
+ * Finds the next upcoming Friday (from tomorrow, looking up to a year
+ * ahead) that hasn't already reached MAX_PER_DATE. Returns null if none
+ * is found within that window.
+ * @returns {string|null} YYYY-MM-DD, or null.
+ */
 export function getNextAvailableFriday() {
   const date = new Date();
   date.setHours(0, 0, 0, 0);

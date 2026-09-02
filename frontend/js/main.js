@@ -1,7 +1,7 @@
-import { addBooking, deleteBooking } from "./service.js";
+import { addBooking, deleteBooking, removeCompletedBookings } from "./service.js";
 import { getBookings } from "./state.js";
 import { render } from "./ui.js";
-import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput } from "./validators.js";
+import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, capitalizeWords } from "./validators.js";
 import { showToast, confirmDialog } from "./notifications.js";
 import { initModal, openModal } from "./modal.js";
 import { initEditModal, openEditModal } from "./edit-modal.js";
@@ -10,6 +10,7 @@ import { initCalendar, refreshCalendar } from "./calendar.js";
 const form = document.getElementById("bookingForm");
 const nameInput = document.getElementById("name");
 const phoneInput = document.getElementById("phone");
+const countryCodeInput = document.getElementById("countryCode");
 const dayTypeInput = document.getElementById("dayType");
 const nameError = document.getElementById("nameError");
 const phoneError = document.getElementById("phoneError");
@@ -35,6 +36,7 @@ function handleSubmit(e) {
 
   const name = nameInput.value.trim();
   const phone = cleanPhoneInput(phoneInput.value);
+  const countryCode = countryCodeInput.value;
   const dayType = dayTypeInput.value;
 
   let hasError = false;
@@ -56,17 +58,25 @@ function handleSubmit(e) {
   if (!phone) {
     setFieldError(phoneInput, phoneError, "Phone number is required.");
     hasError = true;
-  } else if (!isValidPhone(phone)) {
-    setFieldError(phoneInput, phoneError, "Enter a valid 10-digit mobile number starting with 6–9.");
+  } else if (!isValidPhone(phone, countryCode)) {
+    setFieldError(
+      phoneInput,
+      phoneError,
+      countryCode === "+91"
+        ? "Enter a valid 10-digit mobile number starting with 6–9."
+        : "Enter a valid mobile number."
+    );
     hasError = true;
   }
 
   if (hasError) return;
 
   try {
-    addBooking({ name, phone, dayType });
+    addBooking({ name, phone, countryCode, dayType });
     showToast(`${name} added to the waiting list.`, "success");
     form.reset();
+    countryCodeInput.value = "+91";
+    updatePhoneMaxLength();
     clearFieldErrors();
     refresh();
   } catch (err) {
@@ -94,12 +104,32 @@ async function handleDelete(id) {
   refresh();
 }
 
+function updatePhoneMaxLength() {
+  const maxLen = countryCodeInput.value === "+91" ? 10 : 14;
+  phoneInput.maxLength = maxLen;
+  phoneInput.placeholder = countryCodeInput.value === "+91" ? "10-digit number" : "Mobile number";
+}
+
 phoneInput.addEventListener("input", () => {
-  phoneInput.value = cleanPhoneInput(phoneInput.value);
+  phoneInput.value = cleanPhoneInput(phoneInput.value, countryCodeInput.value);
   setFieldError(phoneInput, phoneError, "");
 });
 
+countryCodeInput.addEventListener("change", () => {
+  updatePhoneMaxLength();
+  phoneInput.value = cleanPhoneInput(phoneInput.value, countryCodeInput.value);
+  setFieldError(phoneInput, phoneError, "");
+});
+
+updatePhoneMaxLength();
+
 nameInput.addEventListener("input", () => {
+  const cursorPos = nameInput.selectionStart;
+  const capitalized = capitalizeWords(nameInput.value);
+  if (capitalized !== nameInput.value) {
+    nameInput.value = capitalized;
+    nameInput.setSelectionRange(cursorPos, cursorPos);
+  }
   setFieldError(nameInput, nameError, "");
 });
 
@@ -108,4 +138,5 @@ form.addEventListener("submit", handleSubmit);
 initModal({ onSuccess: refresh });
 initEditModal({ onSuccess: refresh });
 initCalendar();
+removeCompletedBookings();
 refresh();

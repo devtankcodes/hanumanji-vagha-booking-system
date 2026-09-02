@@ -13,7 +13,7 @@
 <body>
 
     <header class="app-header">
-        <img src="frontend/assets/logo.png" alt="Shree Chamatkarik Hanumanji Mandir logo" class="app-logo" onerror="this.style.display='none'">
+        <img src="frontend/assets/logo.png" alt="Shree Hanumanji Mandir logo" class="app-logo" onerror="this.style.display='none'">
         <h1>Vagha Management</h1>
     </header>
 
@@ -26,7 +26,14 @@
 
             <label for="phone">Phone</label>
             <div class="phone-field">
-                <span class="phone-prefix">+91</span>
+                <select id="countryCode" class="country-code-select" aria-label="Country code">
+                    <option value="+91" selected>+91</option>
+                    <option value="+1">+1</option>
+                    <option value="+44">+44</option>
+                    <option value="+61">+61</option>
+                    <option value="+65">+65</option>
+                    <option value="+971">+971</option>
+                </select>
                 <input type="tel" id="phone" name="phone" inputmode="numeric" placeholder="10-digit number"
                     maxlength="10" required>
             </div>
@@ -87,8 +94,15 @@
 
             <label for="editPhone">Phone</label>
             <div class="phone-field">
-                <span class="phone-prefix">+91</span>
-                <input type="tel" id="editPhone" inputmode="numeric" maxlength="10">
+                <select id="editCountryCode" class="country-code-select" aria-label="Country code">
+                    <option value="+91" selected>+91</option>
+                    <option value="+1">+1</option>
+                    <option value="+44">+44</option>
+                    <option value="+61">+61</option>
+                    <option value="+65">+65</option>
+                    <option value="+971">+971</option>
+                </select>
+                <input type="tel" id="editPhone" inputmode="numeric" placeholder="10-digit number" maxlength="10">
             </div>
             <p class="field-error" id="editPhoneError"></p>
 

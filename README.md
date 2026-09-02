@@ -12,16 +12,24 @@ future server-backed version and is not yet connected to anything.
 
 ## Features
 
-- Add a devotee to the waiting list, with name and 10-digit phone validation
-  (+91 prefix, digits only)
+- Add a devotee to the waiting list, with name and phone validation
+  (selectable country code, defaulting to +91; strict 10-digit rule for
+  India, general length check for other countries)
+- Name is auto-capitalized per word as it's typed ("dev tank" → "Dev Tank")
+- Edit a waiting or confirmed devotee's name/phone/country code (day type
+  is only editable while still waiting — see the comment on
+  `updateBooking` in `service.js` for why)
 - Assign a confirmed Vagha date, with a smart "next available Friday"
   suggestion, a Friday-only check for Friday-type bookings, and a per-date
   capacity check
 - Duplicate-phone and duplicate-date protection
 - Confirmed list highlights the soonest upcoming booking and includes a
-  one-tap WhatsApp confirmation message
+  one-tap WhatsApp confirmation message (with venue, occasion, and the
+  temple's Instagram page)
+- Bookings whose Vagha date has already passed are automatically removed
+  from the Confirmed List on app load
 - Read-only calendar view of all confirmed bookings, with the next
-  available Friday highlighted
+  available Friday and every confirmed date highlighted
 - Delete a booking, with a named confirmation prompt and toast feedback
 
 ## Running locally
@@ -52,4 +60,4 @@ No build step is needed — `index.html` at the repo root is the entry point.
 - Real database persistence (`database/schema.sql` → MySQL/Postgres/Supabase)
   with REST routes in `backend/server.js`
 - Admin login
-- Editable bookings (currently: delete and re-add)
+- Automated tests and CI

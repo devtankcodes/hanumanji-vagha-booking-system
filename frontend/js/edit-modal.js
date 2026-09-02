@@ -1,6 +1,6 @@
 import { getBookings } from "./state.js";
 import { updateBooking } from "./service.js";
-import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput } from "./validators.js";
+import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, capitalizeWords } from "./validators.js";
 import { showToast } from "./notifications.js";
 
 let selectedId = null;
@@ -9,11 +9,24 @@ let onUpdated = () => {};
 const modal = () => document.getElementById("editModal");
 const nameInput = () => document.getElementById("editName");
 const phoneInput = () => document.getElementById("editPhone");
+const countryCodeInput = () => document.getElementById("editCountryCode");
 const dayTypeInput = () => document.getElementById("editDayType");
-const dayTypeField = () => dayTypeInput().closest("label")?.parentElement || dayTypeInput();
 const nameError = () => document.getElementById("editNameError");
 const phoneError = () => document.getElementById("editPhoneError");
 
+function updatePhoneMaxLength() {
+  const isIndia = countryCodeInput().value === "+91";
+  phoneInput().maxLength = isIndia ? 10 : 14;
+  phoneInput().placeholder = isIndia ? "10-digit number" : "Mobile number";
+}
+
+/**
+ * Wires up the Edit Devotee modal's event listeners. Call once on app
+ * startup, before any call to openEditModal.
+ *
+ * @param {Object} params
+ * @param {() => void} params.onSuccess - Called after a successful save, to refresh the list/calendar.
+ */
 export function initEditModal({ onSuccess }) {
   onUpdated = onSuccess;
 
@@ -23,21 +36,46 @@ export function initEditModal({ onSuccess }) {
     if (e.target === modal()) closeEditModal();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !modal().classList.contains("hidden")) closeEditModal();
+    if (modal().classList.contains("hidden")) return;
+    if (e.key === "Escape") closeEditModal();
+    if (e.key === "Enter" && (e.target === nameInput() || e.target === phoneInput())) {
+      e.preventDefault();
+      handleSave();
+    }
   });
 
   phoneInput().addEventListener("input", () => {
-    phoneInput().value = cleanPhoneInput(phoneInput().value);
+    phoneInput().value = cleanPhoneInput(phoneInput().value, countryCodeInput().value);
+    phoneError().textContent = "";
+    phoneInput().classList.remove("invalid");
+  });
+
+  countryCodeInput().addEventListener("change", () => {
+    updatePhoneMaxLength();
+    phoneInput().value = cleanPhoneInput(phoneInput().value, countryCodeInput().value);
     phoneError().textContent = "";
     phoneInput().classList.remove("invalid");
   });
 
   nameInput().addEventListener("input", () => {
+    const cursorPos = nameInput().selectionStart;
+    const capitalized = capitalizeWords(nameInput().value);
+    if (capitalized !== nameInput().value) {
+      nameInput().value = capitalized;
+      nameInput().setSelectionRange(cursorPos, cursorPos);
+    }
     nameError().textContent = "";
     nameInput().classList.remove("invalid");
   });
 }
 
+/**
+ * Opens the Edit Devotee modal pre-filled with an existing booking's data.
+ * Day type is only editable while the booking is still "waiting" (see
+ * comment in service.js's updateBooking for why).
+ *
+ * @param {number} id - The booking id to edit.
+ */
 export function openEditModal(id) {
   const booking = getBookings().find(b => b.id === id);
   if (!booking) return;
@@ -45,6 +83,8 @@ export function openEditModal(id) {
   selectedId = id;
   nameInput().value = booking.name;
   phoneInput().value = booking.phone;
+  countryCodeInput().value = booking.countryCode || "+91";
+  updatePhoneMaxLength();
   dayTypeInput().value = booking.dayType;
   nameError().textContent = "";
   phoneError().textContent = "";
@@ -68,7 +108,8 @@ function closeEditModal() {
 
 function handleSave() {
   const name = nameInput().value.trim();
-  const phone = cleanPhoneInput(phoneInput().value);
+  const phone = cleanPhoneInput(phoneInput().value, countryCodeInput().value);
+  const countryCode = countryCodeInput().value;
   const dayType = dayTypeInput().disabled ? undefined : dayTypeInput().value;
 
   let hasError = false;
@@ -95,8 +136,10 @@ function handleSave() {
     phoneError().textContent = "Phone number is required.";
     phoneInput().classList.add("invalid");
     hasError = true;
-  } else if (!isValidPhone(phone)) {
-    phoneError().textContent = "Enter a valid 10-digit mobile number starting with 6–9.";
+  } else if (!isValidPhone(phone, countryCode)) {
+    phoneError().textContent = countryCode === "+91"
+      ? "Enter a valid 10-digit mobile number starting with 6–9."
+      : "Enter a valid mobile number.";
     phoneInput().classList.add("invalid");
     hasError = true;
   }
@@ -104,8 +147,8 @@ function handleSave() {
   if (hasError) return;
 
   try {
-    updateBooking(selectedId, { name, phone, dayType });
-    showToast("Devotee details updated.", "success");
+    updateBooking(selectedId, { name, phone, countryCode, dayType });
+    showToast(`${name}'s details updated.`, "success");
     closeEditModal();
     onUpdated();
   } catch (err) {

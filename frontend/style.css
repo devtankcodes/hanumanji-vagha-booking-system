@@ -135,6 +135,23 @@ input.invalid {
   white-space: nowrap;
 }
 
+.country-code-select {
+  border: none;
+  background: #f9fafb;
+  padding: 12px 6px 12px 12px;
+  font-size: 16px;
+  color: black;
+  border-right: 1px solid #d1d5db;
+  border-radius: 0;
+  margin: 0;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.country-code-select:focus {
+  outline: none;
+}
+
 .phone-field input {
   border: none;
   margin: 0;
@@ -249,7 +266,7 @@ button:disabled {
 
 #calendar {
   font-size: 13px;
-  margin-top: 25px;
+  margin-top: 14px;
 }
 
 /* Header toolbar: nav buttons + month title */

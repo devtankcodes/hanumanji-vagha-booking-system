@@ -1,5 +1,6 @@
 export function getWhatsAppLink(booking) {
-  const phone = `91${booking.phone}`;
+  const dialCode = (booking.countryCode || "+91").replace("+", "");
+  const phone = `${dialCode}${booking.phone}`;
 
   const formattedDate = new Date(booking.date).toLocaleDateString("en-IN", {
     weekday: "long",
@@ -8,16 +9,19 @@ export function getWhatsAppLink(booking) {
     year: "numeric"
   });
 
-  const msg = `🙏 Jai Siyaram, ${booking.name} ji
+  const msg = `🙏 Jai Siyaram, *${booking.name}* ji
 
-Your Vagha booking at Shree Hanumanji Mandir is confirmed.
+Your Vagha booking has been successfully confirmed at *Shree Chamatkarik Hanumanji Mandir*.
 
 📅 Date: ${formattedDate}
 🕉️ Occasion: ${booking.dayType === "Friday" ? "Weekly Friday Vagha" : "Special Day Vagha"}
+📍 Venue: A.G. Chowk, Kalawad Road, Rajkot, Gujarat, 360005
 
-Please arrive a little before the scheduled time. For any changes, feel free to reply to this message.
+📸 Your Vagha seva will be featured on our official Instagram page every Saturday: https://www.instagram.com/shreechamatkarikdham/
 
-Jai Hanuman 🙏`;
+For any changes or inquiries, feel free to reply to this message.
+
+Jai Hanumanji Maharaj 🙏`;
 
   return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
 }
