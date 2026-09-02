@@ -13,6 +13,14 @@ export function hasOnlyLetterCharacters(name) {
   return /^[A-Za-z\s]*$/.test(name.trim());
 }
 
+// Strips digits and special characters as the user types, so the name
+// field can never contain them in the first place (letters and spaces
+// only). Same "clean on every keystroke" pattern as cleanPhoneInput —
+// this replaces the need to catch bad input only at submit time.
+export function cleanNameInput(value) {
+  return value.replace(/[^A-Za-z\s]/g, "");
+}
+
 // Kept for anywhere that just needs a single true/false check.
 export function isValidName(name) {
   return isNameLongEnough(name) && hasOnlyLetterCharacters(name) && name.trim().length <= 60;

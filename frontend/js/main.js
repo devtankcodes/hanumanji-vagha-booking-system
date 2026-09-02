@@ -1,7 +1,7 @@
 import { addBooking, deleteBooking, removeCompletedBookings } from "./service.js";
 import { getBookings } from "./state.js";
 import { render } from "./ui.js";
-import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, capitalizeWords } from "./validators.js";
+import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords } from "./validators.js";
 import { showToast, confirmDialog } from "./notifications.js";
 import { initModal, openModal } from "./modal.js";
 import { initEditModal, openEditModal } from "./edit-modal.js";
@@ -125,10 +125,17 @@ updatePhoneMaxLength();
 
 nameInput.addEventListener("input", () => {
   const cursorPos = nameInput.selectionStart;
-  const capitalized = capitalizeWords(nameInput.value);
-  if (capitalized !== nameInput.value) {
+  const original = nameInput.value;
+  const cleaned = cleanNameInput(original);
+  const capitalized = capitalizeWords(cleaned);
+  if (capitalized !== original) {
+    // Characters may have been stripped before the cursor, so shift the
+    // cursor back by however many were removed rather than pinning it
+    // to the original position (which could now be past the new end).
+    const removedBeforeCursor = original.slice(0, cursorPos).length - cleanNameInput(original.slice(0, cursorPos)).length;
     nameInput.value = capitalized;
-    nameInput.setSelectionRange(cursorPos, cursorPos);
+    const newPos = Math.max(0, cursorPos - removedBeforeCursor);
+    nameInput.setSelectionRange(newPos, newPos);
   }
   setFieldError(nameInput, nameError, "");
 });

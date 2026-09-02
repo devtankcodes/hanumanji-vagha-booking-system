@@ -1,6 +1,6 @@
 import { getBookings } from "./state.js";
 import { updateBooking } from "./service.js";
-import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, capitalizeWords } from "./validators.js";
+import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords } from "./validators.js";
 import { showToast } from "./notifications.js";
 
 let selectedId = null;
@@ -59,10 +59,14 @@ export function initEditModal({ onSuccess }) {
 
   nameInput().addEventListener("input", () => {
     const cursorPos = nameInput().selectionStart;
-    const capitalized = capitalizeWords(nameInput().value);
-    if (capitalized !== nameInput().value) {
+    const original = nameInput().value;
+    const cleaned = cleanNameInput(original);
+    const capitalized = capitalizeWords(cleaned);
+    if (capitalized !== original) {
+      const removedBeforeCursor = original.slice(0, cursorPos).length - cleanNameInput(original.slice(0, cursorPos)).length;
       nameInput().value = capitalized;
-      nameInput().setSelectionRange(cursorPos, cursorPos);
+      const newPos = Math.max(0, cursorPos - removedBeforeCursor);
+      nameInput().setSelectionRange(newPos, newPos);
     }
     nameError().textContent = "";
     nameInput().classList.remove("invalid");

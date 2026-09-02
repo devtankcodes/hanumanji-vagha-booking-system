@@ -6,7 +6,7 @@ export function getWhatsAppLink(booking) {
     weekday: "long",
     day: "numeric",
     month: "long",
-    year: "numeric"
+    year: "numeric",
   });
 
   const msg = `🙏 Jai Siyaram, *${booking.name}* ji
