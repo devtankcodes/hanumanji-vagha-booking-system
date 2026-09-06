@@ -40,11 +40,15 @@ function doPost(e) {
       // triggers Sheets' auto-number detection, but setValues() on an
       // already-text cell from a prior write doesn't re-trigger it.
       data.phone ? "'" + data.phone : "",
-      // Same forced-text treatment as phone, to stop "2026-09-11" from
-      // being auto-parsed into a real Date cell (which would then read
-      // back shifted by timezone on doGet, same bug this codebase avoids
-      // everywhere else with formatDate/formatDateDisplay).
-      data.date ? "'" + data.date : "",
+      // BOOKING DATE is written as a real Date object (not forced text)
+      // built from the incoming "YYYY-MM-DD" string's own year/month/day
+      // components — never `new Date(isoString)`, which parses as UTC and
+      // can silently shift a day off in IST. Writing a real Date (instead
+      // of fighting Sheets' auto-conversion with a leading apostrophe,
+      // like phone above) is what lets the setNumberFormat() call below
+      // guarantee every row displays the same dd/mm/yyyy format, whether
+      // the row was just inserted or is being edited/reassigned.
+      parseIsoDateLocal(data.date),
       data.occasion || "",
       // Stored capitalized ("Waiting" / "Confirmed") purely for a nicer-
       // looking sheet — the app itself works with lowercase status
@@ -55,10 +59,21 @@ function doPost(e) {
       createdAt
     ];
 
+    var targetRow;
     if (existingRow) {
       sheet.getRange(existingRow, 1, 1, rowValues.length).setValues([rowValues]);
+      targetRow = existingRow;
     } else {
       sheet.appendRow(rowValues);
+      targetRow = sheet.getLastRow();
+    }
+
+    // Column D (BOOKING DATE) is column index 4. Setting this explicitly
+    // on every write is what keeps the display format identical across
+    // appendRow() and setValues() — see the comment on parseIsoDateLocal
+    // below for why that distinction otherwise causes mismatched formats.
+    if (data.date) {
+      sheet.getRange(targetRow, 4).setNumberFormat("dd/mm/yyyy");
     }
 
     return jsonResponse({ result: "success", id: data.id });
@@ -102,12 +117,26 @@ function doGet(e) {
   }
 }
 
-// Google Sheets sometimes auto-converts a "YYYY-MM-DD" string into a real
-// Date value on write, even though doPost() below stores it as forced text
-// (leading apostrophe) specifically to prevent that. This function handles
-// BOTH cases so old rows written before that fix still read back correctly,
-// using the script's own timezone rather than toISOString() (which is UTC
-// and would silently shift the date back a day for IST spreadsheets).
+// Converts the app's "YYYY-MM-DD" string into a real Date built from its
+// own year/month/day components (not `new Date(isoString)`, which parses
+// as UTC midnight and can display a day early in timezones ahead of UTC,
+// like IST). Returns "" untouched for an empty/missing date so a
+// still-waiting booking's blank BOOKING DATE cell stays blank.
+function parseIsoDateLocal(isoStr) {
+  if (!isoStr) return "";
+  var parts = String(isoStr).split("-");
+  if (parts.length !== 3) return isoStr; // unexpected shape: leave as-is rather than guess
+  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+}
+
+// Reads BOOKING DATE back out. Rows written after this fix are always a
+// real Date (see parseIsoDateLocal + the setNumberFormat call in doPost),
+// formatted here using the script's own timezone rather than
+// toISOString() (which is UTC and would silently shift the date back a
+// day for IST spreadsheets). The plain-string branch below only exists
+// for rows written before this fix, which may still hold raw text like
+// "2027-01-20" — editing or reassigning one of those bookings resaves it
+// as a proper Date and it'll display consistently from then on.
 function formatCellDate(value) {
   if (!value) return "";
   if (Object.prototype.toString.call(value) === "[object Date]") {
