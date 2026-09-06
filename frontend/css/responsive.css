@@ -7,10 +7,34 @@
    narrow or very wide screens.
    ========================================================= */
 
+/* ---- Phones (up to 479px, e.g. Galaxy S24, Galaxy A36 5G) ----
+   Desktop/tablet keep the original auto-width buttons (each
+   sized to its own label, row wraps if it must). On phones
+   only, force all three action buttons onto a single row by
+   making them share the row equally instead of wrapping. */
+@media (max-width: 479px) {
+  .entry-actions {
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .entry-actions button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .entry-actions .btn-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 /* ---- Very small phones (e.g. old iPhone SE, ~320-359px) ----
-   Tighten padding and let action buttons wrap to two rows
-   with equal width instead of squeezing three labels onto
-   one line. */
+   Tighten the equal-width buttons above even further so the
+   three labels still fit without wrapping to a second row. */
 @media (max-width: 359px) {
   body {
     padding: 10px;
@@ -20,22 +44,11 @@
     padding: 14px;
   }
 
-  .entry-actions {
-    width: 100%;
-  }
-
   .entry-actions button {
-    flex: 1 1 calc(50% - 6px);
-  }
-}
-
-/* ---- Small/standard phones (360-479px) ----
-   Default mobile-first styles already cover this range; this
-   query only nudges the action buttons to share space evenly
-   when three of them sit on one row. */
-@media (min-width: 360px) and (max-width: 479px) {
-  .entry-actions button {
-    flex: 1 1 auto;
+    padding-left: 4px;
+    padding-right: 4px;
+    gap: 4px;
+    font-size: 12px;
   }
 }
 
