@@ -1,0 +1,91 @@
+/* =========================================================
+   entries.css
+   Individual devotee entries shown in the Confirmed List and
+   Waiting List: name, metadata rows (date/day/phone), action
+   buttons row, and the "next up" highlight state.
+   ========================================================= */
+
+.entry {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 2px solid transparent;
+  border-left: 4px solid var(--border);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.entry:hover {
+  border-left-color: var(--saffron);
+}
+
+.entry-info {
+  min-width: 0; /* allows long names/numbers to wrap instead of overflowing the card */
+  flex: 1 1 200px;
+}
+
+.entry-info strong {
+  display: block;
+  font-size: var(--font-base);
+  overflow-wrap: anywhere;
+}
+
+.entry-info p {
+  margin: 2px 0 0;
+  font-size: var(--font-sm);
+  color: var(--muted);
+}
+
+.entry-info p.entry-meta {
+  font-weight: 500;
+}
+
+.entry-info p.entry-phone {
+  margin-top: 3px;
+  letter-spacing: 0.2px;
+}
+
+.entry-info p.entry-meta,
+.entry-info p.entry-phone {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.meta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.meta-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.empty-state {
+  color: var(--muted);
+  font-size: var(--font-base);
+  text-align: center;
+  padding: 22px 10px;
+}
+
+/* Highlight the soonest upcoming confirmed booking */
+.entry-next {
+  background: #eff6ff;
+  border-color: var(--blue);
+  border-left-color: var(--blue);
+}

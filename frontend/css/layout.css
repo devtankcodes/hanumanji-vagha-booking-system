@@ -1,0 +1,94 @@
+/* =========================================================
+   layout.css
+   Page-level structural pieces: header, section cards, and
+   the generic list container shared by Confirmed/Waiting.
+   ========================================================= */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 4px 0 24px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.app-logo {
+  width: clamp(40px, 8vw, 52px);
+  height: clamp(40px, 8vw, 52px);
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.card {
+  background: var(--card);
+  padding: var(--space-lg);
+  margin: 14px 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Section identity: a small colored icon badge before each heading
+   and a matching tint on the count pill, so Confirmed/Waiting/
+   Calendar read as distinct areas at a glance rather than three
+   identical-looking gray cards. */
+.section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.section-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.section-icon.icon-add {
+  background: #fef3c7;
+  color: var(--saffron-dark);
+}
+
+.section-icon.icon-confirmed {
+  background: #dcfce7;
+  color: var(--green-dark);
+}
+
+.section-icon.icon-waiting {
+  background: #dbeafe;
+  color: var(--blue-dark);
+}
+
+.section-icon.icon-calendar {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.count {
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

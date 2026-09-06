@@ -6,7 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
     <title>Vagha Management System</title>
-    <link rel="stylesheet" href="frontend/style.css">
+    <link rel="stylesheet" href="frontend/css/base.css">
+    <link rel="stylesheet" href="frontend/css/layout.css">
+    <link rel="stylesheet" href="frontend/css/forms.css">
+    <link rel="stylesheet" href="frontend/css/buttons.css">
+    <link rel="stylesheet" href="frontend/css/entries.css">
+    <link rel="stylesheet" href="frontend/css/calendar.css">
+    <link rel="stylesheet" href="frontend/css/overlays.css">
+    <link rel="stylesheet" href="frontend/css/responsive.css">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
 </head>
 
@@ -17,8 +24,11 @@
         <h1>Vagha Management</h1>
     </header>
 
-    <div class="card">
-        <h2>Add Devotee</h2>
+    <div class="card card--add">
+        <h2>
+            <span class="section-icon icon-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg></span>
+            Add Devotee
+        </h2>
         <form id="bookingForm" novalidate>
             <label for="name">Name</label>
             <input type="text" id="name" name="name" placeholder="Full name" autocomplete="name" required>
@@ -49,23 +59,37 @@
         </form>
     </div>
 
-    <div class="card">
-        <h2>Confirmed List <span class="count" id="confirmedCount">0</span></h2>
+    <div class="card card--confirmed">
+        <h2>
+            <span class="section-icon icon-confirmed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+            Confirmed List <span class="count" id="confirmedCount">0</span>
+        </h2>
         <ul id="confirmedList">
             <li class="empty-state">No confirmed bookings yet.</li>
         </ul>
     </div>
 
-    <div class="card">
-        <h2>Waiting List <span class="count" id="waitingCount">0</span></h2>
+    <div class="card card--waiting">
+        <h2>
+            <span class="section-icon icon-waiting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+            Waiting List <span class="count" id="waitingCount">0</span>
+        </h2>
         <ul id="waitingList">
             <li class="empty-state">No one is waiting right now.</li>
         </ul>
     </div>
 
-    <div class="card">
-        <h2>Calendar View</h2>
+    <div class="card card--calendar">
+        <h2>
+            <span class="section-icon icon-calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+            Calendar View
+        </h2>
         <div id="calendar"></div>
+        <div class="calendar-legend">
+            <span class="legend-item"><span class="legend-dot legend-dot--today"></span>Today</span>
+            <span class="legend-item"><span class="legend-dot legend-dot--next"></span>Next available Friday</span>
+            <span class="legend-item"><span class="legend-dot legend-dot--booked"></span>Confirmed booking</span>
+        </div>
     </div>
 
     <!-- MODAL -->

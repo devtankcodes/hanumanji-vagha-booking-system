@@ -1,0 +1,97 @@
+/* =========================================================
+   forms.css
+   Add/Edit Devotee form controls: text inputs, selects, the
+   composite phone field, and validation error text.
+   ========================================================= */
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 4px 0 0;
+  font-size: 16px; /* 16px avoids iOS Safari auto-zoom on focus */
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+}
+
+input:focus, select:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+input.invalid {
+  border-color: var(--red);
+}
+
+/* Phone field with fixed country-code prefix */
+.phone-field {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.phone-field:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.phone-prefix {
+  padding: 12px 0 12px 12px;
+  font-size: 16px;
+  color: black;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.country-code-select {
+  border: none;
+  background: #f9fafb;
+  padding: 12px 6px 12px 12px;
+  font-size: 16px;
+  color: black;
+  border-right: 1px solid #d1d5db;
+  border-radius: 0;
+  margin: 0;
+  width: auto;
+  flex-shrink: 0;
+  /* Prevent the select from stretching too wide on large screens
+     while still giving room for codes like +971 */
+  max-width: 96px;
+}
+
+.country-code-select:focus {
+  outline: none;
+}
+
+.phone-field input {
+  border: none;
+  margin: 0;
+  flex: 1;
+  min-width: 0; /* allows the input to shrink instead of overflowing on narrow screens */
+  padding: 12px 12px 12px 6px;
+}
+
+.phone-field input:focus {
+  outline: none;
+}
+
+.field-error {
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 4px;
+  min-height: 16px;
+}
+
+#addBtn {
+  margin-top: 16px;
+  width: 100%;
+  background: var(--saffron);
+  color: white;
+  padding: 12px;
+  font-size: 15px;
+  justify-content: center;
+}

@@ -1,0 +1,149 @@
+/* =========================================================
+   responsive.css
+   Breakpoints only. Component files above are written
+   mobile-first with fluid clamp() values, so this file
+   handles the layout-level adjustments: how wide the page
+   gets, and how the action-button rows reflow on very
+   narrow or very wide screens.
+   ========================================================= */
+
+/* ---- Very small phones (e.g. old iPhone SE, ~320-359px) ----
+   Tighten padding and let action buttons wrap to two rows
+   with equal width instead of squeezing three labels onto
+   one line. */
+@media (max-width: 359px) {
+  body {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .entry-actions {
+    width: 100%;
+  }
+
+  .entry-actions button {
+    flex: 1 1 calc(50% - 6px);
+  }
+}
+
+/* ---- Small/standard phones (360-479px) ----
+   Default mobile-first styles already cover this range; this
+   query only nudges the action buttons to share space evenly
+   when three of them sit on one row. */
+@media (min-width: 360px) and (max-width: 479px) {
+  .entry-actions button {
+    flex: 1 1 auto;
+  }
+}
+
+/* ---- Tablets (480-767px) ----
+   Slightly roomier spacing now that there's more width to work
+   with, while the layout is still a single column. */
+@media (min-width: 480px) {
+  :root {
+    --content-max-width: 600px;
+  }
+
+  .card {
+    padding: 22px;
+  }
+
+  .entry {
+    padding: 14px 16px;
+  }
+}
+
+/* ---- Large tablets / small laptops (768-1023px) ---- */
+@media (min-width: 768px) {
+  :root {
+    --content-max-width: 720px;
+  }
+
+  body {
+    padding: 24px;
+  }
+
+  /* Give the add-devotee form a two-column layout on wider
+     screens: Name gets its own full-width row (names vary a
+     lot in length), then Phone and Day Type share a row below
+     it — this also naturally caps the phone field's width
+     instead of letting it stretch edge-to-edge, which was
+     unnecessarily wide for a fixed 10-digit number.
+
+     Named grid-template-areas are used (rather than relying on
+     auto-placement with per-item grid-column rules) so every
+     field's row is explicit and can't drift if fields are
+     reordered in the HTML later. */
+  #bookingForm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    grid-template-areas:
+      "name-label    name-label"
+      "name-input    name-input"
+      "name-error    name-error"
+      "phone-label   dayType-label"
+      "phone-field   dayType-input"
+      "phone-error   dayType-error"
+      "submit        submit";
+  }
+
+  #bookingForm > label[for="name"]     { grid-area: name-label; }
+  #bookingForm > #name                 { grid-area: name-input; }
+  #bookingForm > #nameError            { grid-area: name-error; }
+
+  #bookingForm > label[for="phone"]    { grid-area: phone-label; }
+  #bookingForm > .phone-field          { grid-area: phone-field; }
+  #bookingForm > #phoneError           { grid-area: phone-error; }
+
+  #bookingForm > label[for="dayType"]  { grid-area: dayType-label; }
+  #bookingForm > #dayType              { grid-area: dayType-input; }
+
+  #bookingForm > #addBtn               { grid-area: submit; }
+
+  /* Labels sit at the top of each field's row, not vertically
+     centered against the taller of the two rows they share. */
+  #bookingForm > label {
+    margin-top: 0;
+    align-self: end;
+  }
+
+  #bookingForm > #dayType {
+    margin-top: 4px;
+  }
+
+}
+
+/* ---- Desktop (1024px+) ----
+   Widen the content area further and give entries a bit more
+   breathing room; the design still reads as a single centered
+   column rather than stretching edge-to-edge on ultra-wide
+   monitors. */
+@media (min-width: 1024px) {
+  :root {
+    --content-max-width: 820px;
+  }
+
+  body {
+    padding: 32px;
+  }
+
+  .card {
+    padding: 28px;
+  }
+
+  .entry {
+    padding: 16px 18px;
+  }
+
+  #calendar {
+    font-size: 14px;
+  }
+
+  .fc .fc-daygrid-day-frame {
+    height: 90px;
+  }
+}

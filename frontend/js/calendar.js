@@ -28,7 +28,7 @@ function getCalendarEvents() {
   const confirmedHighlights = confirmedDates.map(date => ({
     start: date,
     display: "background",
-    color: "#dcfce7"
+    color: "#bbf7d0"
   }));
 
   const nextFriday = getNextAvailableFriday();

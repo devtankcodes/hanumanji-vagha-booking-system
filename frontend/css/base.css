@@ -1,0 +1,104 @@
+/* =========================================================
+   base.css
+   Global reset, design tokens (CSS variables), and base
+   typography. No component-specific rules belong here.
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --saffron: #f59e0b;
+  --saffron-dark: #d97706;
+  --blue: #3b82f6;
+  --blue-dark: #2563eb;
+  --green: #22c55e;
+  --green-dark: #16a34a;
+  --red: #ef4444;
+  --red-dark: #dc2626;
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --radius: 14px;
+  --radius-sm: 8px;
+
+  /* A small shadow scale gives cards/buttons consistent depth
+     instead of every component inventing its own box-shadow. */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12);
+
+  --transition: 150ms ease;
+
+  /* Fluid spacing/typography scales used across components.
+     clamp() lets these adapt smoothly between small phones and
+     large desktop screens instead of jumping at breakpoints. */
+  --space-sm: clamp(6px, 1.2vw, 8px);
+  --space-md: clamp(10px, 2vw, 14px);
+  --space-lg: clamp(16px, 3vw, 22px);
+
+  --font-sm: clamp(12px, 2.4vw, 13px);
+  --font-base: clamp(14px, 2.6vw, 15px);
+  --font-lg: clamp(17px, 3.2vw, 20px);
+  --font-xl: clamp(20px, 4vw, 26px);
+
+  /* Comfortable content width for large screens; on phones the
+     body simply fills the viewport minus padding. */
+  --content-max-width: 640px;
+}
+
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Inter", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  margin: 0;
+  padding: var(--space-md);
+  background: var(--bg);
+  color: var(--ink);
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+  font-size: var(--font-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  text-align: center;
+  margin: 0;
+  font-size: var(--font-xl);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  margin: 0 0 14px;
+  font-size: var(--font-lg);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+label {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+/* A single, consistent focus style for every interactive element,
+   instead of relying on (or fighting) each browser's default. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+.phone-field:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}

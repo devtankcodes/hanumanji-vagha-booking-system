@@ -1,5 +1,5 @@
 import { addBooking, deleteBooking, removeCompletedBookings } from "./service.js";
-import { getBookings } from "./state.js";
+import { getBookings, loadBookingsFromSheet } from "./state.js";
 import { render } from "./ui.js";
 import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords } from "./validators.js";
 import { showToast, confirmDialog } from "./notifications.js";
@@ -145,5 +145,32 @@ form.addEventListener("submit", handleSubmit);
 initModal({ onSuccess: refresh });
 initEditModal({ onSuccess: refresh });
 initCalendar();
-removeCompletedBookings();
-refresh();
+
+// The Google Sheet is the source of truth, so the app has to fetch it
+// once before anything meaningful can be shown. addBtn is disabled for
+// the duration so a devotee can't be added while the initial list is
+// still unknown (avoids a confusing duplicate-looking entry once the
+// real data arrives).
+async function init() {
+  const addBtn = document.getElementById("addBtn");
+  addBtn.disabled = true;
+  addBtn.textContent = "Loading…";
+
+  try {
+    await loadBookingsFromSheet();
+  } catch (err) {
+    console.error("Failed to load bookings from Google Sheets:", err);
+    showToast(
+      "Couldn't load the devotee list from Google Sheets. Check your connection and reload.",
+      "error",
+    );
+  }
+
+  addBtn.disabled = false;
+  addBtn.textContent = "Add Devotee";
+
+  removeCompletedBookings();
+  refresh();
+}
+
+init();

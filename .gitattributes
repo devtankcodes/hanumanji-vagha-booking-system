@@ -1,0 +1,5 @@
+# Normalize all text files to LF in the repository, regardless of what
+# line endings a contributor's editor/OS writes on checkout. This stops
+# diffs from showing whole files as "changed" just because one commit
+# was made from an editor that uses CRLF (Windows-style) endings.
+* text=auto eol=lf

@@ -4,6 +4,7 @@ import { showToast } from "./notifications.js";
 
 let selectedId = null;
 let selectedDayType = null;
+let isReassignFlow = false;
 let onAssigned = () => {};
 
 const modal = () => document.getElementById("modal");
@@ -47,6 +48,7 @@ export function openModal(id) {
   const booking = getBookings().find(b => b.id === id);
   selectedDayType = booking ? booking.dayType : null;
   const isReassign = booking && booking.status === "confirmed";
+  isReassignFlow = isReassign;
 
   const suggestion = selectedDayType === "Friday" ? getNextAvailableFriday() : null;
 
@@ -77,6 +79,7 @@ function closeModal() {
   modal().classList.add("hidden");
   selectedId = null;
   selectedDayType = null;
+  isReassignFlow = false;
 }
 
 function handleConfirm() {
@@ -97,9 +100,20 @@ function handleConfirm() {
     return;
   }
 
+  // Look up the name before assignBooking() runs, since a fresh
+  // assign moves the record from the waiting list into confirmed.
+  const booking = getBookings().find(b => b.id === selectedId);
+  const name = booking ? booking.name : "Devotee";
+  const wasReassign = isReassignFlow;
+
   try {
     assignBooking(selectedId, date);
-    showToast("Booking confirmed!", "success");
+    showToast(
+      wasReassign
+        ? `${name}'s booking moved to ${formatDateDisplay(date)}.`
+        : `${name} confirmed for ${formatDateDisplay(date)}!`,
+      "success"
+    );
     closeModal();
     onAssigned();
   } catch (err) {

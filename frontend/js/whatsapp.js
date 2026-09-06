@@ -21,7 +21,7 @@ Your Vagha booking has been successfully confirmed at *Shree Chamatkarik Hanuman
 
 For any changes or inquiries, feel free to reply to this message.
 
-Jai Hanumanji Maharaj 🙏`;
+Jai Hanumanji Maharaj 🙏🚩`;
 
   return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
 }

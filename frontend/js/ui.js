@@ -1,6 +1,7 @@
 import { getBookings } from "./state.js";
 import { getWhatsAppLink } from "./whatsapp.js";
 import { formatDateDisplay, getTodayLocal } from "./service.js";
+import { icons } from "./icons.js";
 
 /**
  * Returns the id of the confirmed booking with the soonest upcoming date,
@@ -30,11 +31,16 @@ function buildEntry(item, { showDate, actions, highlight }) {
   name.textContent = item.name; // textContent: safe, no HTML injection
 
   const meta = document.createElement("p");
-  meta.textContent = showDate
-    ? `${formatDateDisplay(item.date)} • ${item.dayType}`
-    : `${item.countryCode || "+91"} ${item.phone} • ${item.dayType}`;
+  meta.className = "entry-meta";
+  meta.innerHTML = showDate
+    ? `<span class="meta-icon">${icons.calendar}</span> ${formatDateDisplay(item.date)} • ${item.dayType}`
+    : `${item.dayType}`;
 
-  info.append(name, meta);
+  const phone = document.createElement("p");
+  phone.className = "entry-phone";
+  phone.innerHTML = `<span class="meta-icon">${icons.phone}</span> ${item.countryCode || "+91"} ${item.phone}`;
+
+  info.append(name, meta, phone);
 
   const actionsWrap = document.createElement("div");
   actionsWrap.className = "entry-actions";
@@ -44,11 +50,15 @@ function buildEntry(item, { showDate, actions, highlight }) {
   return entry;
 }
 
-function makeButton(label, className, onClick) {
+function makeButton(label, className, onClick, iconSvg) {
   const btn = document.createElement("button");
-  btn.textContent = label;
   btn.className = className;
   btn.type = "button";
+  if (iconSvg) {
+    btn.innerHTML = `<span class="btn-icon">${iconSvg}</span><span class="btn-label">${label}</span>`;
+  } else {
+    btn.textContent = label;
+  }
   btn.addEventListener("click", onClick);
   return btn;
 }
@@ -90,9 +100,9 @@ export function render({ onAssign, onDelete, onEdit }) {
       showDate: false,
       highlight: false,
       actions: [
-        makeButton("Edit", "edit-btn", () => onEdit(item.id)),
-        makeButton("Assign", "assign-btn", () => onAssign(item.id)),
-        makeButton("Delete", "delete-btn", () => onDelete(item.id))
+        makeButton("Edit", "edit-btn", () => onEdit(item.id), icons.edit),
+        makeButton("Assign", "assign-btn", () => onAssign(item.id), icons.assign),
+        makeButton("Delete", "delete-btn", () => onDelete(item.id), icons.delete)
       ]
     }));
     waitingContainer.appendChild(li);
@@ -107,9 +117,9 @@ export function render({ onAssign, onDelete, onEdit }) {
       showDate: true,
       highlight: item.id === nextUpcomingId,
       actions: [
-        makeButton("WhatsApp", "whatsapp-btn", () => window.open(getWhatsAppLink(item), "_blank")),
-        makeButton("Reassign", "assign-btn", () => onAssign(item.id)),
-        makeButton("Delete", "delete-btn", () => onDelete(item.id))
+        makeButton("WhatsApp", "whatsapp-btn", () => window.open(getWhatsAppLink(item), "_blank"), icons.whatsapp),
+        makeButton("Reassign", "assign-btn", () => onAssign(item.id), icons.reassign),
+        makeButton("Delete", "delete-btn", () => onDelete(item.id), icons.delete)
       ]
     }));
     confirmedContainer.appendChild(li);
