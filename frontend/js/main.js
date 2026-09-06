@@ -174,3 +174,22 @@ async function init() {
 }
 
 init();
+
+// Collapse/expand for the Confirmed List and Waiting List sections.
+// Purely a display toggle on the <ul> — it doesn't touch getBookings()
+// or re-render anything, so it's unaffected by (and unaffected-by-safe
+// from) refresh() rebuilding the list contents after every mutation.
+function setupCollapsibleSection(toggleId, listId) {
+  const toggle = document.getElementById(toggleId);
+  const list = document.getElementById(listId);
+  if (!toggle || !list) return;
+
+  toggle.addEventListener("click", () => {
+    const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", String(!isExpanded));
+    toggle.closest(".card").classList.toggle("is-collapsed", isExpanded);
+  });
+}
+
+setupCollapsibleSection("confirmedToggle", "confirmedList");
+setupCollapsibleSection("waitingToggle", "waitingList");

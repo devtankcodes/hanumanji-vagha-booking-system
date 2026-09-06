@@ -60,20 +60,26 @@
     </div>
 
     <div class="card card--confirmed">
-        <h2>
-            <span class="section-icon icon-confirmed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
-            Confirmed List <span class="count" id="confirmedCount">0</span>
-        </h2>
+        <button type="button" class="section-toggle" id="confirmedToggle" aria-expanded="true" aria-controls="confirmedList">
+            <h2>
+                <span class="section-icon icon-confirmed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+                Confirmed List <span class="count" id="confirmedCount">0</span>
+            </h2>
+            <span class="chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
         <ul id="confirmedList">
             <li class="empty-state">No confirmed bookings yet.</li>
         </ul>
     </div>
 
-    <div class="card card--waiting">
-        <h2>
-            <span class="section-icon icon-waiting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-            Waiting List <span class="count" id="waitingCount">0</span>
-        </h2>
+    <div class="card card--waiting is-collapsed">
+        <button type="button" class="section-toggle" id="waitingToggle" aria-expanded="false" aria-controls="waitingList">
+            <h2>
+                <span class="section-icon icon-waiting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                Waiting List <span class="count" id="waitingCount">0</span>
+            </h2>
+            <span class="chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
         <ul id="waitingList">
             <li class="empty-state">No one is waiting right now.</li>
         </ul>

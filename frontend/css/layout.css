@@ -92,3 +92,79 @@ ul {
   flex-direction: column;
   gap: 10px;
 }
+
+/* Collapsible section header (Confirmed List / Waiting List). The
+   entire header is a <button> so the whole row is tappable on mobile,
+   not just a small arrow icon — important when this is being tapped
+   one-handed on a phone. */
+.section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0 14px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.section-toggle:hover {
+  filter: none; /* override the generic button:hover darken/lift — this isn't a colored action button */
+  transform: none;
+  box-shadow: none;
+}
+
+.section-toggle h2 {
+  margin: 0;
+  flex: 1;
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform var(--transition), background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.chevron svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition);
+}
+
+.section-toggle:hover .chevron {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: var(--saffron-dark);
+}
+
+.section-toggle:active .chevron {
+  transform: scale(0.92);
+}
+
+/* Rotate the chevron to point right (collapsed) instead of down (open).
+   Scoped to the svg rather than the circular badge itself, so the
+   badge's hover scale/tap-scale transforms above don't fight with the
+   rotation transform. */
+.section-toggle[aria-expanded="false"] .chevron svg {
+  transform: rotate(-90deg);
+}
+
+/* The list itself is what actually hides — kept as a separate rule
+   (rather than hiding the whole .card) so the heading + count badge
+   stay visible and tappable while collapsed. */
+.card.is-collapsed > ul {
+  display: none;
+}
