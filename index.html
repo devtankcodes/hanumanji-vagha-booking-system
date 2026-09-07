@@ -31,7 +31,7 @@
         </h2>
         <form id="bookingForm" novalidate>
             <label for="name">Name</label>
-            <input type="text" id="name" name="name" placeholder="Full name" autocomplete="name" required>
+            <input type="text" id="name" name="name" placeholder="Full name" autocomplete="name" minlength="3" maxlength="50" required>
             <p class="field-error" id="nameError"></p>
 
             <label for="phone">Phone</label>
@@ -119,7 +119,7 @@
             <h3 id="editModalTitle">Edit Devotee</h3>
 
             <label for="editName">Name</label>
-            <input type="text" id="editName" autocomplete="name">
+            <input type="text" id="editName" autocomplete="name" minlength="3" maxlength="50">
             <p class="field-error" id="editNameError"></p>
 
             <label for="editPhone">Phone</label>

@@ -1,6 +1,6 @@
 import { getBookings } from "./state.js";
 import { updateBooking } from "./service.js";
-import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords } from "./validators.js";
+import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
 import { showToast } from "./notifications.js";
 
 let selectedId = null;
@@ -127,11 +127,11 @@ function handleSave() {
     nameInput().classList.add("invalid");
     hasError = true;
   } else if (!isNameLongEnough(name)) {
-    nameError().textContent = "Enter full name (at least 2 characters).";
+    nameError().textContent = `Name must be at least ${NAME_MIN_LENGTH} characters.`;
     nameInput().classList.add("invalid");
     hasError = true;
-  } else if (name.length > 60) {
-    nameError().textContent = "Name is too long.";
+  } else if (!isNameShortEnough(name)) {
+    nameError().textContent = `Name must be under ${NAME_MAX_LENGTH} characters.`;
     nameInput().classList.add("invalid");
     hasError = true;
   }

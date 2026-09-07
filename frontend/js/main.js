@@ -1,7 +1,7 @@
 import { addBooking, deleteBooking, removeCompletedBookings } from "./service.js";
 import { getBookings, loadBookingsFromSheet } from "./state.js";
 import { render } from "./ui.js";
-import { isNameLongEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords } from "./validators.js";
+import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
 import { showToast, confirmDialog } from "./notifications.js";
 import { initModal, openModal } from "./modal.js";
 import { initEditModal, openEditModal } from "./edit-modal.js";
@@ -48,10 +48,10 @@ function handleSubmit(e) {
     setFieldError(nameInput, nameError, "Name should contain only letters and spaces.");
     hasError = true;
   } else if (!isNameLongEnough(name)) {
-    setFieldError(nameInput, nameError, "Enter full name (at least 2 characters).");
+    setFieldError(nameInput, nameError, `Name must be at least ${NAME_MIN_LENGTH} characters.`);
     hasError = true;
-  } else if (name.length > 60) {
-    setFieldError(nameInput, nameError, "Name is too long.");
+  } else if (!isNameShortEnough(name)) {
+    setFieldError(nameInput, nameError, `Name must be under ${NAME_MAX_LENGTH} characters.`);
     hasError = true;
   }
 

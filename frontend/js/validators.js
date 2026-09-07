@@ -1,5 +1,12 @@
+export const NAME_MIN_LENGTH = 3;
+export const NAME_MAX_LENGTH = 50;
+
 export function isNameLongEnough(name) {
-  return name.trim().length >= 2;
+  return name.trim().length >= NAME_MIN_LENGTH;
+}
+
+export function isNameShortEnough(name) {
+  return name.trim().length <= NAME_MAX_LENGTH;
 }
 
 // Capitalizes the first letter of each word (e.g. "dev tank" -> "Dev Tank").
@@ -18,12 +25,12 @@ export function hasOnlyLetterCharacters(name) {
 // only). Same "clean on every keystroke" pattern as cleanPhoneInput —
 // this replaces the need to catch bad input only at submit time.
 export function cleanNameInput(value) {
-  return value.replace(/[^A-Za-z\s]/g, "");
+  return value.replace(/[^A-Za-z\s]/g, "").slice(0, NAME_MAX_LENGTH);
 }
 
 // Kept for anywhere that just needs a single true/false check.
 export function isValidName(name) {
-  return isNameLongEnough(name) && hasOnlyLetterCharacters(name) && name.trim().length <= 60;
+  return isNameLongEnough(name) && isNameShortEnough(name) && hasOnlyLetterCharacters(name);
 }
 
 // India (+91) keeps the strict 10-digit, starts-with-6-9 mobile rule.
