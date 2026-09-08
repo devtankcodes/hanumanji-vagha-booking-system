@@ -1,6 +1,6 @@
 import { getBookings } from "./state.js";
 import { updateBooking } from "./service.js";
-import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
+import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords, getPhoneErrorMessage, getPhoneMaxLength, getPhonePlaceholder, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
 import { showToast } from "./notifications.js";
 
 let selectedId = null;
@@ -15,9 +15,8 @@ const nameError = () => document.getElementById("editNameError");
 const phoneError = () => document.getElementById("editPhoneError");
 
 function updatePhoneMaxLength() {
-  const isIndia = countryCodeInput().value === "+91";
-  phoneInput().maxLength = isIndia ? 10 : 14;
-  phoneInput().placeholder = isIndia ? "10-digit number" : "Mobile number";
+  phoneInput().maxLength = getPhoneMaxLength(countryCodeInput().value);
+  phoneInput().placeholder = getPhonePlaceholder(countryCodeInput().value);
 }
 
 /**
@@ -141,9 +140,7 @@ function handleSave() {
     phoneInput().classList.add("invalid");
     hasError = true;
   } else if (!isValidPhone(phone, countryCode)) {
-    phoneError().textContent = countryCode === "+91"
-      ? "Enter a valid 10-digit mobile number starting with 6–9."
-      : "Enter a valid mobile number.";
+    phoneError().textContent = getPhoneErrorMessage(countryCode);
     phoneInput().classList.add("invalid");
     hasError = true;
   }

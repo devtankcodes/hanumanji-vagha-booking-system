@@ -53,7 +53,7 @@ export function deleteBookingFromSheet(id) {
 // prefix below never stops early at a shorter code that happens to
 // also match (none currently overlap, but this keeps it correct even
 // if a code sharing a prefix is added later).
-const KNOWN_COUNTRY_CODES = ["+971", "+91", "+65", "+61", "+44", "+1"];
+const KNOWN_COUNTRY_CODES = ["+971", "+966", "+965", "+974", "+968", "+973", "+27", "+91", "+65", "+61", "+44", "+1"];
 
 // The sheet stores phone as one merged string (e.g. "+919876543210") since
 // that's simplest for a human glancing at the spreadsheet. The app's data

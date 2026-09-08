@@ -1,7 +1,7 @@
 import { addBooking, deleteBooking, removeCompletedBookings } from "./service.js";
 import { getBookings, loadBookingsFromSheet } from "./state.js";
 import { render } from "./ui.js";
-import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
+import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords, getPhoneErrorMessage, getPhoneMaxLength, getPhonePlaceholder, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
 import { showToast, confirmDialog } from "./notifications.js";
 import { initModal, openModal } from "./modal.js";
 import { initEditModal, openEditModal } from "./edit-modal.js";
@@ -59,13 +59,7 @@ function handleSubmit(e) {
     setFieldError(phoneInput, phoneError, "Phone number is required.");
     hasError = true;
   } else if (!isValidPhone(phone, countryCode)) {
-    setFieldError(
-      phoneInput,
-      phoneError,
-      countryCode === "+91"
-        ? "Enter a valid 10-digit mobile number starting with 6–9."
-        : "Enter a valid mobile number."
-    );
+    setFieldError(phoneInput, phoneError, getPhoneErrorMessage(countryCode));
     hasError = true;
   }
 
@@ -105,9 +99,8 @@ async function handleDelete(id) {
 }
 
 function updatePhoneMaxLength() {
-  const maxLen = countryCodeInput.value === "+91" ? 10 : 14;
-  phoneInput.maxLength = maxLen;
-  phoneInput.placeholder = countryCodeInput.value === "+91" ? "10-digit number" : "Mobile number";
+  phoneInput.maxLength = getPhoneMaxLength(countryCodeInput.value);
+  phoneInput.placeholder = getPhonePlaceholder(countryCodeInput.value);
 }
 
 phoneInput.addEventListener("input", () => {
