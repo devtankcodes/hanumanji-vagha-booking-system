@@ -16,11 +16,7 @@
   flex-wrap: wrap;
   border: 2px solid transparent;
   border-left: 4px solid var(--border);
-  transition: border-color var(--transition), background var(--transition);
-}
-
-.entry:hover {
-  border-left-color: var(--saffron);
+  transition: background var(--transition);
 }
 
 .entry-info {
