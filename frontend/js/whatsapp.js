@@ -13,9 +13,9 @@ export function getWhatsAppLink(booking) {
 
 Your Vagha booking has been successfully confirmed at *Shree Chamatkarik Hanumanji Mandir*.
 
-📅 Date: ${formattedDate}
-🕉️ Occasion: ${booking.dayType === "Friday" ? "Weekly Friday Vagha" : "Special Day Vagha"}
-📍 Venue: A.G. Chowk, Kalawad Road, Rajkot - 360005
+*📅 Date:* ${formattedDate}
+*🕉️ Seva:* ${booking.dayType === "Friday" ? "Friday Vagha Seva" : "Special Day Vagha Seva"}
+*📍 Venue:* A.G. Chowk, Kalawad Road, Rajkot – 360005
 
 📸 Your Vagha seva may be featured on our official Instagram page:  
 https://www.instagram.com/shreechamatkarikdham/
