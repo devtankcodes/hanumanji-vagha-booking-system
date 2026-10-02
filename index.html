@@ -32,8 +32,10 @@
     </header>
 
     <div class="card card--add">
+        <button type="button" class="section-toggle" id="addToggle" aria-expanded="true" aria-controls="bookingForm">
         <h2>
-            <span class="section-icon icon-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <span class="section-icon icon-add">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <line x1="19" y1="8" x2="19" y2="14" />
@@ -42,6 +44,12 @@
             </span>
             Add Devotee
         </h2>
+            <span class="chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                </svg>
+            </span>
+        </button>
         <form id="bookingForm" novalidate>
             <label for="name">Name</label>
             <input type="text" id="name" name="name" placeholder="Full name" autocomplete="name" minlength="3" maxlength="50" required>
