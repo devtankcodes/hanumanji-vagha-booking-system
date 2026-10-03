@@ -101,6 +101,9 @@
       "phone-label   dayType-label"
       "phone-field   dayType-input"
       "phone-error   dayType-error"
+      "email-label   email-label"
+      "email-input   email-input"
+      "email-error   email-error"
       "submit        submit";
   }
 
@@ -111,6 +114,10 @@
   #bookingForm > label[for="phone"]    { grid-area: phone-label; }
   #bookingForm > .phone-field          { grid-area: phone-field; }
   #bookingForm > #phoneError           { grid-area: phone-error; }
+
+  #bookingForm > label[for="email"]    { grid-area: email-label; }
+  #bookingForm > #email                { grid-area: email-input; }
+  #bookingForm > #emailError           { grid-area: email-error; }
 
   #bookingForm > label[for="dayType"]  { grid-area: dayType-label; }
   #bookingForm > #dayType              { grid-area: dayType-input; }

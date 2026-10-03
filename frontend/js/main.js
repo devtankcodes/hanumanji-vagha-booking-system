@@ -1,7 +1,7 @@
 import { addBooking, deleteBooking, removeCompletedBookings } from "./service.js";
 import { getBookings, loadBookingsFromSheet } from "./state.js";
 import { render } from "./ui.js";
-import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords, getPhoneErrorMessage, getPhoneMaxLength, getPhonePlaceholder, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
+import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, getEmailError, suggestEmailFix, sanitizeEmailInput, cleanPhoneInput, cleanNameInput, capitalizeWords, getPhoneErrorMessage, getPhoneMaxLength, getPhonePlaceholder, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
 import { showToast, confirmDialog } from "./notifications.js";
 import { initModal, openModal } from "./modal.js";
 import { initEditModal, openEditModal } from "./edit-modal.js";
@@ -11,9 +11,11 @@ const form = document.getElementById("bookingForm");
 const nameInput = document.getElementById("name");
 const phoneInput = document.getElementById("phone");
 const countryCodeInput = document.getElementById("countryCode");
+const emailInput = document.getElementById("email");
 const dayTypeInput = document.getElementById("dayType");
 const nameError = document.getElementById("nameError");
 const phoneError = document.getElementById("phoneError");
+const emailError = document.getElementById("emailError");
 
 function refresh() {
   render({ onAssign: handleAssign, onDelete: handleDelete, onEdit: handleEdit });
@@ -25,9 +27,15 @@ function setFieldError(input, errorEl, message) {
   input.classList.toggle("invalid", Boolean(message));
 }
 
+// The email the "Did you mean ...?" hint was already shown for. Showing it
+// once per address keeps it a hint, not a wall: submitting the same
+// address again keeps it as typed.
+let typoWarnedFor = "";
+
 function clearFieldErrors() {
   setFieldError(nameInput, nameError, "");
   setFieldError(phoneInput, phoneError, "");
+  setFieldError(emailInput, emailError, "");
 }
 
 function handleSubmit(e) {
@@ -37,6 +45,7 @@ function handleSubmit(e) {
   const name = nameInput.value.trim();
   const phone = cleanPhoneInput(phoneInput.value);
   const countryCode = countryCodeInput.value;
+  const email = emailInput.value.trim();
   const dayType = dayTypeInput.value;
 
   let hasError = false;
@@ -63,12 +72,26 @@ function handleSubmit(e) {
     hasError = true;
   }
 
+  const emailMessage = getEmailError(email);
+  if (emailMessage) {
+    setFieldError(emailInput, emailError, emailMessage);
+    hasError = true;
+  } else {
+    const suggestion = suggestEmailFix(email);
+    if (suggestion && typoWarnedFor !== email) {
+      typoWarnedFor = email;
+      setFieldError(emailInput, emailError, `Did you mean ${suggestion}? Correct it, or submit again to keep it as typed.`);
+      hasError = true;
+    }
+  }
+
   if (hasError) return;
 
   try {
-    addBooking({ name, phone, countryCode, dayType });
+    addBooking({ name, phone, countryCode, email, dayType });
     showToast(`${name} added to the waiting list.`, "success");
     form.reset();
+    typoWarnedFor = "";
     countryCodeInput.value = "+91";
     updatePhoneMaxLength();
     clearFieldErrors();
@@ -106,6 +129,17 @@ function updatePhoneMaxLength() {
 phoneInput.addEventListener("input", () => {
   phoneInput.value = cleanPhoneInput(phoneInput.value, countryCodeInput.value);
   setFieldError(phoneInput, phoneError, "");
+});
+
+emailInput.addEventListener("input", () => {
+  sanitizeEmailInput(emailInput);
+  setFieldError(emailInput, emailError, "");
+});
+
+// Check the address as soon as the user leaves the field, since stray
+// symbols are no longer removed automatically while typing.
+emailInput.addEventListener("blur", () => {
+  setFieldError(emailInput, emailError, getEmailError(emailInput.value.trim()));
 });
 
 countryCodeInput.addEventListener("change", () => {

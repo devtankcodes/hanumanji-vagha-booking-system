@@ -29,7 +29,7 @@ async function postToSheet(payload, { attempt = 1 } = {}) {
 }
 
 // Maps a booking object to the sheet's column layout:
-// ID | DEVOTEE NAME | PHONE NUMBER | BOOKING DATE | OCCASION | STATUS | CREATED AT
+// ID | DEVOTEE_NAME | PHONE | EMAIL | BOOKING_DATE | SEVA_TYPE | STATUS | EMAIL_SENT | CREATED_AT
 export function syncBookingToSheet(booking) {
   return postToSheet({
     id: booking.id,
@@ -41,6 +41,7 @@ export function syncBookingToSheet(booking) {
     occasion: booking.dayType || "",
     status: booking.status || "",
     createdAt: booking.createdAt || null,
+    email: booking.email || "",
   });
 }
 
@@ -79,6 +80,7 @@ function normalizeBooking(row) {
     name: row.name || "",
     phone,
     countryCode,
+    email: row.email || "",
     dayType: row.dayType || "Friday",
     status: row.status || "waiting",
     date: row.date || null,

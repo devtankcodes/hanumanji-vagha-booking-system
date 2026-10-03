@@ -1,5 +1,5 @@
 export const CONFIG = {
-  SHEET_API_URL: "https://script.google.com/macros/s/AKfycbwlHYjmaSjVVbftOqJ_wxBAr3mxU1FJG30lm20BGYUdodTn3UzYotHf383noLkKT7rNyw/exec",
+  SHEET_API_URL: "https://script.google.com/macros/s/AKfycby9bwCeDByz_opSCFjCT3dXDkQP8ajv30Y6jOQ3f9i7oOxUwknELtijTa3pi2Jrbo8PJw/exec",
   // Shared secret checked by Code.gs before accepting a write/delete.
   // This is NOT true security — since the site is static and this file
   // ships to every visitor's browser, anyone who reads the JS source can

@@ -79,6 +79,12 @@ input.invalid {
   outline: none;
 }
 
+.optional-label {
+  font-weight: 400;
+  opacity: 0.65;
+  font-size: 0.85em;
+}
+
 .field-error {
   color: var(--red);
   font-size: 12px;

@@ -1,3 +1,35 @@
+// Header text (row 1) of every column the script uses. Columns are found
+// by these NAMES, never by position, so you can reorder columns or insert
+// new ones anywhere in the sheet without touching this code. Matching is
+// case-insensitive; a missing header throws a clear error.
+var COLUMN_HEADERS = {
+  id: "ID",
+  name: "DEVOTEE_NAME",
+  phone: "PHONE",
+  email: "EMAIL",
+  date: "BOOKING_DATE",
+  sevaType: "SEVA_TYPE",
+  status: "STATUS",
+  emailSent: "EMAIL_SENT",
+  createdAt: "CREATED_AT"
+};
+
+// Returns { id: 0, name: 1, ... } (0-based positions) from the header row.
+function getColumnIndexes(headerRow) {
+  var normalized = headerRow.map(function (h) {
+    return String(h).trim().toUpperCase();
+  });
+  var cols = {};
+  Object.keys(COLUMN_HEADERS).forEach(function (key) {
+    var index = normalized.indexOf(COLUMN_HEADERS[key]);
+    if (index === -1) {
+      throw new Error('Sheet is missing the "' + COLUMN_HEADERS[key] + '" column header in row 1.');
+    }
+    cols[key] = index;
+  });
+  return cols;
+}
+
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -9,10 +41,13 @@ function doPost(e) {
       throw new Error("Missing required field: id.");
     }
 
+    var values = sheet.getDataRange().getValues();
+    var cols = getColumnIndexes(values[0]);
+    var existingRow = findRowById(values, cols, data.id);
+
     if (data.action === "delete") {
-      var rowToDelete = findRowById(sheet, data.id);
-      if (rowToDelete) {
-        sheet.deleteRow(rowToDelete);
+      if (existingRow) {
+        sheet.deleteRow(existingRow);
       }
       return jsonResponse({ result: "success", action: "deleted", id: data.id });
     }
@@ -21,59 +56,73 @@ function doPost(e) {
       throw new Error("Missing required fields (name, phone).");
     }
 
-    var existingRow = findRowById(sheet, data.id);
-    // Column layout: ID | DEVOTEE NAME | PHONE NUMBER | BOOKING DATE | OCCASION | STATUS | CREATED AT
+    // Start from the existing row (so any extra columns you add to the
+    // sheet are left alone) or a blank row for a new devotee, then fill
+    // in each known column by its header position.
+    var width = values[0].length;
+    var row = existingRow
+      ? values[existingRow - 1].slice()
+      : new Array(width).fill("");
+
     // CREATED AT should only be stamped once, on first insert — not
     // overwritten every time an existing devotee is updated/reassigned.
-    var createdAt = existingRow
-      ? sheet.getRange(existingRow, 7).getValue()
-      : new Date();
+    var createdAt = existingRow ? row[cols.createdAt] : new Date();
 
-    var rowValues = [
-      data.id,
-      data.name,
-      // Leading apostrophe forces Sheets to store this as literal text
-      // instead of auto-detecting "+91 9876543210" as a number and
-      // silently stripping the "+" (and the space) — this is exactly why
-      // freshly-added devotees were showing up without a "+" while
-      // edited/reassigned ones weren't: appendRow() on a fresh cell
-      // triggers Sheets' auto-number detection, but setValues() on an
-      // already-text cell from a prior write doesn't re-trigger it.
-      data.phone ? "'" + data.phone : "",
-      // BOOKING DATE is written as a real Date object (not forced text)
-      // built from the incoming "YYYY-MM-DD" string's own year/month/day
-      // components — never `new Date(isoString)`, which parses as UTC and
-      // can silently shift a day off in IST. Writing a real Date (instead
-      // of fighting Sheets' auto-conversion with a leading apostrophe,
-      // like phone above) is what lets the setNumberFormat() call below
-      // guarantee every row displays the same dd/mm/yyyy format, whether
-      // the row was just inserted or is being edited/reassigned.
-      parseIsoDateLocal(data.date),
-      data.occasion || "",
-      // Stored capitalized ("Waiting" / "Confirmed") purely for a nicer-
-      // looking sheet — the app itself works with lowercase status
-      // internally (see doGet below, which lowercases it again on the
-      // way back in), so this is display-only and doesn't need any
-      // changes elsewhere in the app.
-      capitalize(data.status),
-      createdAt
-    ];
+    // Remember the old booking date before it's overwritten below, so we
+    // can tell whether this save moved the booking to a different day.
+    var previousDate = existingRow ? formatCellDate(row[cols.date]) : "";
+
+    row[cols.id] = data.id;
+    row[cols.name] = data.name;
+    // Leading apostrophe forces Sheets to store this as literal text
+    // instead of auto-detecting "+91 9876543210" as a number and
+    // silently stripping the "+" (and the space) — this is exactly why
+    // freshly-added devotees were showing up without a "+" while
+    // edited/reassigned ones weren't: appendRow() on a fresh cell
+    // triggers Sheets' auto-number detection, but setValues() on an
+    // already-text cell from a prior write doesn't re-trigger it.
+    row[cols.phone] = data.phone ? "'" + data.phone : "";
+    // EMAIL is optional. Stored trimmed + lowercase; blank clears it.
+    row[cols.email] = data.email ? String(data.email).trim().toLowerCase() : "";
+    // BOOKING DATE is written as a real Date object (not forced text)
+    // built from the incoming "YYYY-MM-DD" string's own year/month/day
+    // components — never `new Date(isoString)`, which parses as UTC and
+    // can silently shift a day off in IST. Writing a real Date (instead
+    // of fighting Sheets' auto-conversion with a leading apostrophe,
+    // like phone above) is what lets the setNumberFormat() call below
+    // guarantee every row displays the same dd/mm/yyyy format, whether
+    // the row was just inserted or is being edited/reassigned.
+    row[cols.date] = parseIsoDateLocal(data.date);
+    row[cols.sevaType] = data.occasion || "";
+    // Stored capitalized ("Waiting" / "Confirmed") purely for a nicer-
+    // looking sheet — the app itself works with lowercase status
+    // internally (see doGet below, which lowercases it again on the
+    // way back in), so this is display-only and doesn't need any
+    // changes elsewhere in the app.
+    row[cols.status] = capitalize(data.status);
+    row[cols.createdAt] = createdAt;
+    // EMAIL_SENT is owned by Reminders.gs. It's cleared only for a brand-
+    // new row or when the booking date changes (an old reminder no longer
+    // applies to the new date); every other edit leaves it untouched.
+    if (!existingRow || previousDate !== (data.date || "")) {
+      row[cols.emailSent] = "";
+    }
 
     var targetRow;
     if (existingRow) {
-      sheet.getRange(existingRow, 1, 1, rowValues.length).setValues([rowValues]);
+      sheet.getRange(existingRow, 1, 1, width).setValues([row]);
       targetRow = existingRow;
     } else {
-      sheet.appendRow(rowValues);
+      sheet.appendRow(row);
       targetRow = sheet.getLastRow();
     }
 
-    // Column D (BOOKING DATE) is column index 4. Setting this explicitly
-    // on every write is what keeps the display format identical across
-    // appendRow() and setValues() — see the comment on parseIsoDateLocal
-    // below for why that distinction otherwise causes mismatched formats.
+    // Setting the number format explicitly on every write is what keeps
+    // the display format identical across appendRow() and setValues() —
+    // see the comment on parseIsoDateLocal below for why that distinction
+    // otherwise causes mismatched formats. (+1: getRange is 1-based.)
     if (data.date) {
-      sheet.getRange(targetRow, 4).setNumberFormat("dd/mm/yyyy");
+      sheet.getRange(targetRow, cols.date + 1).setNumberFormat("dd/mm/yyyy");
     }
 
     return jsonResponse({ result: "success", id: data.id });
@@ -89,25 +138,27 @@ function doGet(e) {
 
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = sheet.getDataRange().getValues();
+    var cols = getColumnIndexes(data[0]);
     var bookings = [];
 
-    // Row 1 is the header (ID | DEVOTEE NAME | PHONE NUMBER | BOOKING DATE |
-    // OCCASION | STATUS | CREATED AT), so data rows start at index 1.
+    // Row 1 is the header, so data rows start at index 1.
     for (var i = 1; i < data.length; i++) {
       var row = data[i];
-      if (!row[0]) continue; // skip any stray blank row
+      if (!row[cols.id]) continue; // skip any stray blank row
 
+      var createdAt = row[cols.createdAt];
       bookings.push({
-        id: row[0],
-        name: row[1],
-        phone: row[2],
-        date: formatCellDate(row[3]),
-        dayType: row[4],
+        id: row[cols.id],
+        name: row[cols.name],
+        phone: row[cols.phone],
+        email: row[cols.email] ? String(row[cols.email]).trim() : "",
+        date: formatCellDate(row[cols.date]),
+        dayType: row[cols.sevaType],
         // Sheet stores "Waiting"/"Confirmed" for readability; the app's
         // own logic checks lowercase ("waiting"/"confirmed"), so it's
         // normalized back here.
-        status: (row[5] || "").toString().toLowerCase(),
-        createdAt: row[6] instanceof Date ? row[6].toISOString() : row[6]
+        status: (row[cols.status] || "").toString().toLowerCase(),
+        createdAt: createdAt instanceof Date ? createdAt.toISOString() : createdAt
       });
     }
 
@@ -157,10 +208,11 @@ function jsonResponse(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
-function findRowById(sheet, id) {
-  var data = sheet.getDataRange().getValues();
-  for (var i = 1; i < data.length; i++) {
-    if (String(data[i][0]) === String(id)) {
+// Returns the 1-based sheet row number for an ID, or null. Works on the
+// values already read by the caller (one sheet read per request).
+function findRowById(values, cols, id) {
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][cols.id]) === String(id)) {
       return i + 1;
     }
   }

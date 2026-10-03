@@ -76,6 +76,11 @@
             </div>
             <p class="field-error" id="phoneError"></p>
 
+            <label for="email">Email <span class="optional-label">(optional)</span></label>
+            <input type="text" id="email" name="email" placeholder="name@example.com" autocomplete="email"
+                inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="100">
+            <p class="field-error" id="emailError"></p>
+
             <label for="dayType">Day Type</label>
             <select id="dayType" name="dayType">
                 <option value="Friday" selected>Friday</option>
@@ -187,6 +192,10 @@
                 <input type="tel" id="editPhone" inputmode="numeric" placeholder="10-digit number" maxlength="10">
             </div>
             <p class="field-error" id="editPhoneError"></p>
+
+            <label for="editEmail">Email <span class="optional-label">(optional)</span></label>
+            <input type="text" id="editEmail" inputmode="email" placeholder="name@example.com" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="100">
+            <p class="field-error" id="editEmailError"></p>
 
             <label for="editDayType">Day Type</label>
             <select id="editDayType">

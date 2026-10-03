@@ -1,5 +1,5 @@
 import { getBookings, setBookings } from "./state.js";
-import { capitalizeWords } from "./validators.js";
+import { capitalizeWords, normalizeEmail } from "./validators.js";
 import { syncBookingToSheet, deleteBookingFromSheet } from "./sheets-sync.js";
 
 // Max devotees allowed on a single vagha date. Adjust to match real capacity.
@@ -22,7 +22,7 @@ export function isDateFull(date, excludeId = null) {
   return count >= MAX_PER_DATE;
 }
 
-export function addBooking({ name, phone, countryCode = "+91", dayType }) {
+export function addBooking({ name, phone, countryCode = "+91", email = "", dayType }) {
   if (isPhoneAlreadyRegistered(phone, countryCode)) {
     throw new Error("This phone number is already registered.");
   }
@@ -33,6 +33,7 @@ export function addBooking({ name, phone, countryCode = "+91", dayType }) {
     name: capitalizeWords(name.trim()),
     phone: phone.trim(),
     countryCode,
+    email: normalizeEmail(email),
     dayType,
     status: "waiting",
     date: null,
@@ -44,7 +45,7 @@ export function addBooking({ name, phone, countryCode = "+91", dayType }) {
   return newBooking;
 }
 
-export function updateBooking(id, { name, phone, countryCode, dayType }) {
+export function updateBooking(id, { name, phone, countryCode, email, dayType }) {
   const bookings = getBookings();
   const target = bookings.find((b) => b.id === id);
   const effectiveCountryCode = countryCode || (target ? target.countryCode : "+91") || "+91";
@@ -69,6 +70,7 @@ export function updateBooking(id, { name, phone, countryCode, dayType }) {
           name: name.trim(),
           phone: phone.trim(),
           ...(countryCode ? { countryCode } : {}),
+          ...(email !== undefined ? { email: normalizeEmail(email) } : {}),
           ...(b.status === "waiting" && dayType ? { dayType } : {}),
         }
       : b,

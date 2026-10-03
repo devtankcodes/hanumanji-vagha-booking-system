@@ -33,6 +33,122 @@ export function isValidName(name) {
   return isNameLongEnough(name) && isNameShortEnough(name) && hasOnlyLetterCharacters(name);
 }
 
+export const EMAIL_MAX_LENGTH = 100;
+const EMAIL_LOCAL_MAX_LENGTH = 64;
+
+// Cleans the email field on every keystroke. It only makes changes that
+// can never alter WHICH mailbox the address points to: capitals become
+// lowercase and spaces disappear. Everything else (stray symbols, a second
+// "@", double dots...) is left exactly as typed and reported by
+// getEmailError, because silently deleting characters could turn a typo
+// into a different, valid address that belongs to someone else.
+export function cleanEmailInput(value) {
+  return (value || "").toLowerCase().replace(/\s/g, "").slice(0, EMAIL_MAX_LENGTH);
+}
+
+// Applies cleanEmailInput to a live <input> without throwing the caret to
+// the end of the field when something is changed mid-text. (The field is
+// type="text" + inputmode="email" because type="email" inputs don't allow
+// reading or setting the caret.)
+export function sanitizeEmailInput(input) {
+  const before = input.value;
+  const cleaned = cleanEmailInput(before);
+  if (cleaned === before) return;
+  const caret = cleanEmailInput(before.slice(0, input.selectionStart ?? before.length)).length;
+  input.value = cleaned;
+  input.setSelectionRange(caret, caret);
+}
+
+// Returns a human-readable problem with the email, or "" if it's fine.
+// Email is optional everywhere: an empty value is valid (the devotee just
+// won't get an emailed reminder). A non-empty value must follow the rules
+// below — practical rules for real-world addresses, not full RFC 5322.
+export function getEmailError(email) {
+  const value = (email || "").trim();
+  if (!value) return "";
+
+  if (value.length > EMAIL_MAX_LENGTH) return `Email must be ${EMAIL_MAX_LENGTH} characters or fewer.`;
+  if (/\s/.test(value)) return "Email can't contain spaces.";
+  if (/[A-Z]/.test(value)) return "Use lowercase letters only.";
+  if (value.split("@").length !== 2) return "Email must contain exactly one @ (e.g. name@gmail.com).";
+
+  const [local, domain] = value.split("@");
+
+  if (!local) return "Enter the part before the @.";
+  if (local.length > EMAIL_LOCAL_MAX_LENGTH) return `The part before the @ can be at most ${EMAIL_LOCAL_MAX_LENGTH} characters.`;
+  if (!/^[a-z0-9._+-]+$/.test(local)) return "Before the @, use only lowercase letters, numbers and . _ + -";
+  if (local.startsWith(".") || local.endsWith(".") || local.includes("..")) {
+    return "The part before the @ can't start or end with a dot, or have two dots in a row.";
+  }
+
+  if (!domain) return "Enter the domain after the @ (e.g. gmail.com).";
+  if (!/^[a-z0-9.-]+$/.test(domain)) return "After the @, use only lowercase letters, numbers, dots and hyphens.";
+  if (!domain.includes(".")) return "The domain needs a dot, like gmail.com.";
+
+  const labels = domain.split(".");
+  if (labels.some((label) => label === "")) return "The domain can't start or end with a dot, or have two dots in a row.";
+  if (labels.some((label) => label.startsWith("-") || label.endsWith("-"))) {
+    return "Parts of the domain can't start or end with a hyphen.";
+  }
+  if (labels.some((label) => label.length > 63)) return "A part of the domain is too long.";
+  if (!/^[a-z]{2,24}$/.test(labels[labels.length - 1])) return "The domain must end in a valid extension like .com or .in.";
+
+  return "";
+}
+
+export function isValidEmail(email) {
+  return getEmailError(email) === "";
+}
+
+// ---- "Did you mean gmail.com?" ----------------------------------------
+// A syntactically valid address can still be a typo (ram@gmial.com passes
+// every rule above). This spots domains that are ONE small slip away from
+// a well-known provider and suggests the corrected address. It's only a
+// hint — the caller lets the user keep what they typed.
+const COMMON_EMAIL_DOMAINS = [
+  "gmail.com", "googlemail.com", "yahoo.com", "yahoo.in", "yahoo.co.in",
+  "outlook.com", "outlook.in", "hotmail.com", "live.com", "icloud.com",
+  "rediffmail.com", "proton.me", "protonmail.com",
+];
+
+// Edit distance where swapping two neighbouring letters counts as ONE
+// change (so "gmial" is 1 away from "gmail", not 2).
+function editDistance(a, b) {
+  const rows = a.length + 1;
+  const cols = b.length + 1;
+  const d = Array.from({ length: rows }, (_, i) => [i, ...Array(cols - 1).fill(0)]);
+  for (let j = 1; j < cols; j++) d[0][j] = j;
+  for (let i = 1; i < rows; i++) {
+    for (let j = 1; j < cols; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+  }
+  return d[rows - 1][cols - 1];
+}
+
+// Returns the corrected full address (e.g. "ram@gmail.com"), or "" when
+// there's nothing to suggest. Only call this on an address that already
+// passed getEmailError.
+export function suggestEmailFix(email) {
+  const value = (email || "").trim();
+  if (getEmailError(value) !== "" || !value) return "";
+
+  const [local, domain] = value.split("@");
+  if (COMMON_EMAIL_DOMAINS.includes(domain)) return "";
+
+  const match = COMMON_EMAIL_DOMAINS.find((known) => editDistance(domain, known) === 1);
+  return match ? `${local}@${match}` : "";
+}
+
+// Stored lowercase and trimmed so the same address is always the same string.
+export function normalizeEmail(email) {
+  return (email || "").trim().toLowerCase();
+}
+
 // Per-country mobile number rules. Add a new entry here (and to the
 // countryCode <select> options in index.html) to support another country
 // with its own strict format. Countries not listed fall back to a general

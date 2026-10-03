@@ -1,18 +1,24 @@
 import { getBookings } from "./state.js";
 import { updateBooking } from "./service.js";
-import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, cleanPhoneInput, cleanNameInput, capitalizeWords, getPhoneErrorMessage, getPhoneMaxLength, getPhonePlaceholder, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
+import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, getEmailError, suggestEmailFix, sanitizeEmailInput, cleanEmailInput, cleanPhoneInput, cleanNameInput, capitalizeWords, getPhoneErrorMessage, getPhoneMaxLength, getPhonePlaceholder, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
 import { showToast } from "./notifications.js";
 
 let selectedId = null;
+// Email as it was when the modal opened, and the changed address the
+// "Did you mean ...?" hint was already shown for (shown once per address).
+let originalEmail = "";
+let typoWarnedFor = "";
 let onUpdated = () => {};
 
 const modal = () => document.getElementById("editModal");
 const nameInput = () => document.getElementById("editName");
 const phoneInput = () => document.getElementById("editPhone");
 const countryCodeInput = () => document.getElementById("editCountryCode");
+const emailInput = () => document.getElementById("editEmail");
 const dayTypeInput = () => document.getElementById("editDayType");
 const nameError = () => document.getElementById("editNameError");
 const phoneError = () => document.getElementById("editPhoneError");
+const emailError = () => document.getElementById("editEmailError");
 
 function updatePhoneMaxLength() {
   phoneInput().maxLength = getPhoneMaxLength(countryCodeInput().value);
@@ -37,7 +43,7 @@ export function initEditModal({ onSuccess }) {
   document.addEventListener("keydown", (e) => {
     if (modal().classList.contains("hidden")) return;
     if (e.key === "Escape") closeEditModal();
-    if (e.key === "Enter" && (e.target === nameInput() || e.target === phoneInput())) {
+    if (e.key === "Enter" && (e.target === nameInput() || e.target === phoneInput() || e.target === emailInput())) {
       e.preventDefault();
       handleSave();
     }
@@ -47,6 +53,20 @@ export function initEditModal({ onSuccess }) {
     phoneInput().value = cleanPhoneInput(phoneInput().value, countryCodeInput().value);
     phoneError().textContent = "";
     phoneInput().classList.remove("invalid");
+  });
+
+  emailInput().addEventListener("input", () => {
+    sanitizeEmailInput(emailInput());
+    emailError().textContent = "";
+    emailInput().classList.remove("invalid");
+  });
+
+  // Check the address as soon as the user leaves the field, since stray
+  // symbols are no longer removed automatically while typing.
+  emailInput().addEventListener("blur", () => {
+    const message = getEmailError(emailInput().value.trim());
+    emailError().textContent = message;
+    emailInput().classList.toggle("invalid", Boolean(message));
   });
 
   countryCodeInput().addEventListener("change", () => {
@@ -88,11 +108,16 @@ export function openEditModal(id) {
   phoneInput().value = booking.phone;
   countryCodeInput().value = booking.countryCode || "+91";
   updatePhoneMaxLength();
+  emailInput().value = cleanEmailInput(booking.email || "");
+  originalEmail = emailInput().value;
+  typoWarnedFor = "";
   dayTypeInput().value = booking.dayType;
   nameError().textContent = "";
   phoneError().textContent = "";
+  emailError().textContent = "";
   nameInput().classList.remove("invalid");
   phoneInput().classList.remove("invalid");
+  emailInput().classList.remove("invalid");
 
   // Day type is only editable while the booking is still waiting.
   const isWaiting = booking.status === "waiting";
@@ -113,6 +138,7 @@ function handleSave() {
   const name = nameInput().value.trim();
   const phone = cleanPhoneInput(phoneInput().value, countryCodeInput().value);
   const countryCode = countryCodeInput().value;
+  const email = emailInput().value.trim();
   const dayType = dayTypeInput().disabled ? undefined : dayTypeInput().value;
 
   let hasError = false;
@@ -145,10 +171,27 @@ function handleSave() {
     hasError = true;
   }
 
+  const emailMessage = getEmailError(email);
+  if (emailMessage) {
+    emailError().textContent = emailMessage;
+    emailInput().classList.add("invalid");
+    hasError = true;
+  } else if (email !== originalEmail) {
+    // "Did you mean ...?" hint, once per changed address. An address that
+    // was already saved and left untouched is never second-guessed.
+    const suggestion = suggestEmailFix(email);
+    if (suggestion && typoWarnedFor !== email) {
+      typoWarnedFor = email;
+      emailError().textContent = `Did you mean ${suggestion}? Correct it, or submit again to keep it as typed.`;
+      emailInput().classList.add("invalid");
+      hasError = true;
+    }
+  }
+
   if (hasError) return;
 
   try {
-    updateBooking(selectedId, { name, phone, countryCode, dayType });
+    updateBooking(selectedId, { name, phone, countryCode, email, dayType });
     showToast(`${name}'s details updated.`, "success");
     closeEditModal();
     onUpdated();
