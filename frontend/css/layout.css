@@ -114,7 +114,8 @@ ul {
 }
 
 .section-toggle:hover {
-  filter: none; /* override the generic button:hover darken/lift — this isn't a colored action button */
+  filter: none;
+  /* override the generic button:hover darken/lift — this isn't a colored action button */
   transform: none;
   box-shadow: none;
 }
@@ -165,7 +166,7 @@ ul {
 /* The list itself is what actually hides — kept as a separate rule
    (rather than hiding the whole .card) so the heading + count badge
    stay visible and tappable while collapsed. */
-.card.is-collapsed > ul,
-.card.is-collapsed > form {
+.card.is-collapsed>ul,
+.card.is-collapsed>form {
   display: none !important;
 }

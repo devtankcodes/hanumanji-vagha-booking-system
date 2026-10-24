@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schemastore.org",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "quoteProps": "as-needed",
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "bracketSameLine": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "singleAttributePerLine": false,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 140,
+        "htmlWhitespaceSensitivity": "css"
+      }
+    },
+    {
+      "files": "*.css",
+      "options": {
+        "printWidth": 80
+      }
+    },
+    {
+      "files": ["*.json", "manifest.webmanifest", "*.webmanifest"],
+      "options": {
+        "parser": "json",
+        "trailingComma": "none"
+      }
+    },
+    {
+      "files": "*.md",
+      "options": {
+        "proseWrap": "always",
+        "printWidth": 80
+      }
+    }
+  ]
+}

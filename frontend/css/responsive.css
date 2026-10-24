@@ -107,31 +107,62 @@
       "submit        submit";
   }
 
-  #bookingForm > label[for="name"]     { grid-area: name-label; }
-  #bookingForm > #name                 { grid-area: name-input; }
-  #bookingForm > #nameError            { grid-area: name-error; }
+  #bookingForm>label[for="name"] {
+    grid-area: name-label;
+  }
 
-  #bookingForm > label[for="phone"]    { grid-area: phone-label; }
-  #bookingForm > .phone-field          { grid-area: phone-field; }
-  #bookingForm > #phoneError           { grid-area: phone-error; }
+  #bookingForm>#name {
+    grid-area: name-input;
+  }
 
-  #bookingForm > label[for="email"]    { grid-area: email-label; }
-  #bookingForm > #email                { grid-area: email-input; }
-  #bookingForm > #emailError           { grid-area: email-error; }
+  #bookingForm>#nameError {
+    grid-area: name-error;
+  }
 
-  #bookingForm > label[for="dayType"]  { grid-area: dayType-label; }
-  #bookingForm > #dayType              { grid-area: dayType-input; }
+  #bookingForm>label[for="phone"] {
+    grid-area: phone-label;
+  }
 
-  #bookingForm > #addBtn               { grid-area: submit; }
+  #bookingForm>.phone-field {
+    grid-area: phone-field;
+  }
+
+  #bookingForm>#phoneError {
+    grid-area: phone-error;
+  }
+
+  #bookingForm>label[for="email"] {
+    grid-area: email-label;
+  }
+
+  #bookingForm>#email {
+    grid-area: email-input;
+  }
+
+  #bookingForm>#emailError {
+    grid-area: email-error;
+  }
+
+  #bookingForm>label[for="dayType"] {
+    grid-area: dayType-label;
+  }
+
+  #bookingForm>#dayType {
+    grid-area: dayType-input;
+  }
+
+  #bookingForm>#addBtn {
+    grid-area: submit;
+  }
 
   /* Labels sit at the top of each field's row, not vertically
      centered against the taller of the two rows they share. */
-  #bookingForm > label {
+  #bookingForm>label {
     margin-top: 0;
     align-self: end;
   }
 
-  #bookingForm > #dayType {
+  #bookingForm>#dayType {
     margin-top: 4px;
   }
 

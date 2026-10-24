@@ -20,7 +20,8 @@
 }
 
 .entry-info {
-  min-width: 0; /* allows long names/numbers to wrap instead of overflowing the card */
+  min-width: 0;
+  /* allows long names/numbers to wrap instead of overflowing the card */
   flex: 1 1 200px;
 }
 

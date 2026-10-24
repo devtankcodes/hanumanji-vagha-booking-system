@@ -1,4 +1,4 @@
-import { fetchBookingsFromSheet } from "./sheets-sync.js";
+import { fetchBookingsFromSheet } from '../services/sheets-sync.js';
 
 // In-memory only — no localStorage. The Google Sheet is now the single
 // source of truth: this array is just the current session's local copy,

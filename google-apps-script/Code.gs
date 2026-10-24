@@ -3,15 +3,15 @@
 // new ones anywhere in the sheet without touching this code. Matching is
 // case-insensitive; a missing header throws a clear error.
 var COLUMN_HEADERS = {
-  id: "ID",
-  name: "DEVOTEE_NAME",
-  phone: "PHONE",
-  email: "EMAIL",
-  date: "BOOKING_DATE",
-  sevaType: "SEVA_TYPE",
-  status: "STATUS",
-  emailSent: "EMAIL_SENT",
-  createdAt: "CREATED_AT"
+  id: 'ID',
+  name: 'DEVOTEE_NAME',
+  phone: 'PHONE',
+  email: 'EMAIL',
+  date: 'BOOKING_DATE',
+  sevaType: 'SEVA_TYPE',
+  status: 'STATUS',
+  emailSent: 'EMAIL_SENT',
+  createdAt: 'CREATED_AT',
 };
 
 // Returns { id: 0, name: 1, ... } (0-based positions) from the header row.
@@ -38,31 +38,29 @@ function doPost(e) {
     checkSecret(data);
 
     if (!data.id) {
-      throw new Error("Missing required field: id.");
+      throw new Error('Missing required field: id.');
     }
 
     var values = sheet.getDataRange().getValues();
     var cols = getColumnIndexes(values[0]);
     var existingRow = findRowById(values, cols, data.id);
 
-    if (data.action === "delete") {
+    if (data.action === 'delete') {
       if (existingRow) {
         sheet.deleteRow(existingRow);
       }
-      return jsonResponse({ result: "success", action: "deleted", id: data.id });
+      return jsonResponse({ result: 'success', action: 'deleted', id: data.id });
     }
 
     if (!data.name || !data.phone) {
-      throw new Error("Missing required fields (name, phone).");
+      throw new Error('Missing required fields (name, phone).');
     }
 
     // Start from the existing row (so any extra columns you add to the
     // sheet are left alone) or a blank row for a new devotee, then fill
     // in each known column by its header position.
     var width = values[0].length;
-    var row = existingRow
-      ? values[existingRow - 1].slice()
-      : new Array(width).fill("");
+    var row = existingRow ? values[existingRow - 1].slice() : new Array(width).fill('');
 
     // CREATED AT should only be stamped once, on first insert — not
     // overwritten every time an existing devotee is updated/reassigned.
@@ -70,7 +68,7 @@ function doPost(e) {
 
     // Remember the old booking date before it's overwritten below, so we
     // can tell whether this save moved the booking to a different day.
-    var previousDate = existingRow ? formatCellDate(row[cols.date]) : "";
+    var previousDate = existingRow ? formatCellDate(row[cols.date]) : '';
 
     row[cols.id] = data.id;
     row[cols.name] = data.name;
@@ -81,9 +79,9 @@ function doPost(e) {
     // edited/reassigned ones weren't: appendRow() on a fresh cell
     // triggers Sheets' auto-number detection, but setValues() on an
     // already-text cell from a prior write doesn't re-trigger it.
-    row[cols.phone] = data.phone ? "'" + data.phone : "";
+    row[cols.phone] = data.phone ? "'" + data.phone : '';
     // EMAIL is optional. Stored trimmed + lowercase; blank clears it.
-    row[cols.email] = data.email ? String(data.email).trim().toLowerCase() : "";
+    row[cols.email] = data.email ? String(data.email).trim().toLowerCase() : '';
     // BOOKING DATE is written as a real Date object (not forced text)
     // built from the incoming "YYYY-MM-DD" string's own year/month/day
     // components — never `new Date(isoString)`, which parses as UTC and
@@ -93,7 +91,7 @@ function doPost(e) {
     // guarantee every row displays the same dd/mm/yyyy format, whether
     // the row was just inserted or is being edited/reassigned.
     row[cols.date] = parseIsoDateLocal(data.date);
-    row[cols.sevaType] = data.occasion || "";
+    row[cols.sevaType] = data.occasion || '';
     // Stored capitalized ("Waiting" / "Confirmed") purely for a nicer-
     // looking sheet — the app itself works with lowercase status
     // internally (see doGet below, which lowercases it again on the
@@ -104,8 +102,8 @@ function doPost(e) {
     // EMAIL_SENT is owned by Reminders.gs. It's cleared only for a brand-
     // new row or when the booking date changes (an old reminder no longer
     // applies to the new date); every other edit leaves it untouched.
-    if (!existingRow || previousDate !== (data.date || "")) {
-      row[cols.emailSent] = "";
+    if (!existingRow || previousDate !== (data.date || '')) {
+      row[cols.emailSent] = '';
     }
 
     var targetRow;
@@ -122,12 +120,12 @@ function doPost(e) {
     // see the comment on parseIsoDateLocal below for why that distinction
     // otherwise causes mismatched formats. (+1: getRange is 1-based.)
     if (data.date) {
-      sheet.getRange(targetRow, cols.date + 1).setNumberFormat("dd/mm/yyyy");
+      sheet.getRange(targetRow, cols.date + 1).setNumberFormat('dd/mm/yyyy');
     }
 
-    return jsonResponse({ result: "success", id: data.id });
+    return jsonResponse({ result: 'success', id: data.id });
   } catch (error) {
-    return jsonResponse({ result: "error", message: error.toString() });
+    return jsonResponse({ result: 'error', message: error.toString() });
   }
 }
 
@@ -151,20 +149,20 @@ function doGet(e) {
         id: row[cols.id],
         name: row[cols.name],
         phone: row[cols.phone],
-        email: row[cols.email] ? String(row[cols.email]).trim() : "",
+        email: row[cols.email] ? String(row[cols.email]).trim() : '',
         date: formatCellDate(row[cols.date]),
         dayType: row[cols.sevaType],
         // Sheet stores "Waiting"/"Confirmed" for readability; the app's
         // own logic checks lowercase ("waiting"/"confirmed"), so it's
         // normalized back here.
-        status: (row[cols.status] || "").toString().toLowerCase(),
-        createdAt: createdAt instanceof Date ? createdAt.toISOString() : createdAt
+        status: (row[cols.status] || '').toString().toLowerCase(),
+        createdAt: createdAt instanceof Date ? createdAt.toISOString() : createdAt,
       });
     }
 
-    return jsonResponse({ result: "success", bookings: bookings });
+    return jsonResponse({ result: 'success', bookings: bookings });
   } catch (error) {
-    return jsonResponse({ result: "error", message: error.toString() });
+    return jsonResponse({ result: 'error', message: error.toString() });
   }
 }
 
@@ -174,8 +172,8 @@ function doGet(e) {
 // like IST). Returns "" untouched for an empty/missing date so a
 // still-waiting booking's blank BOOKING DATE cell stays blank.
 function parseIsoDateLocal(isoStr) {
-  if (!isoStr) return "";
-  var parts = String(isoStr).split("-");
+  if (!isoStr) return '';
+  var parts = String(isoStr).split('-');
   if (parts.length !== 3) return isoStr; // unexpected shape: leave as-is rather than guess
   return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
 }
@@ -189,9 +187,9 @@ function parseIsoDateLocal(isoStr) {
 // "2027-01-20" — editing or reassigning one of those bookings resaves it
 // as a proper Date and it'll display consistently from then on.
 function formatCellDate(value) {
-  if (!value) return "";
-  if (Object.prototype.toString.call(value) === "[object Date]") {
-    return Utilities.formatDate(value, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  if (!value) return '';
+  if (Object.prototype.toString.call(value) === '[object Date]') {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), 'yyyy-MM-dd');
   }
   return String(value);
 }
@@ -199,13 +197,15 @@ function formatCellDate(value) {
 // "waiting" -> "Waiting", "confirmed" -> "Confirmed". Used only for how
 // STATUS looks in the sheet — see the comment at the doPost() call site.
 function capitalize(value) {
-  var str = (value || "").toString();
-  if (!str) return "";
+  var str = (value || '').toString();
+  if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 function jsonResponse(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
+    ContentService.MimeType.JSON,
+  );
 }
 
 // Returns the 1-based sheet row number for an ID, or null. Works on the
@@ -230,11 +230,11 @@ function findRowById(values, cols, id) {
 // find it. Real protection would require routing this call through a
 // server you control instead of hitting Apps Script directly.
 function checkSecret(data) {
-  var expected = PropertiesService.getScriptProperties().getProperty("SYNC_SECRET");
+  var expected = PropertiesService.getScriptProperties().getProperty('SYNC_SECRET');
   if (!expected) {
-    throw new Error("Server misconfigured: SYNC_SECRET is not set in Script Properties.");
+    throw new Error('Server misconfigured: SYNC_SECRET is not set in Script Properties.');
   }
   if (data.secret !== expected) {
-    throw new Error("Unauthorized.");
+    throw new Error('Unauthorized.');
   }
 }

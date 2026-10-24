@@ -13,7 +13,7 @@
   --saffron-dark: #d97706;
   --blue: #3b82f6;
   --blue-dark: #2563eb;
-  --green: #22c55e;
+  --green: #25d366;
   --green-dark: #16a34a;
   --red: #ef4444;
   --red-dark: #dc2626;
@@ -48,6 +48,18 @@
   /* Comfortable content width for large screens; on phones the
      body simply fills the viewport minus padding. */
   --content-max-width: 640px;
+
+  /* Calendar colour system (single source of truth for calendar.css) */
+  /* --cal-normal-bg: #ffffff;
+  --cal-normal-text: #273244;
+  --cal-today-bg: #eaf2ff;
+  --cal-today-accent: #2563eb;
+  --cal-confirmed-bg: #f1faf5;
+  --cal-confirmed-text: #166534;
+  --cal-next-bg: #fff5d6;
+  --cal-next-text: #854d0e;
+  --cal-disabled-bg: #f1f3f5;
+  --cal-disabled-text: #a0a7b2; */
 }
 
 html {

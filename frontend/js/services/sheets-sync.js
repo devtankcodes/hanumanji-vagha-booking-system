@@ -1,5 +1,5 @@
-import { CONFIG } from "./config.js";
-import { showToast } from "./notifications.js";
+import { CONFIG } from '../config/config.js';
+import { showToast } from '../ui/notifications.js';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -8,9 +8,9 @@ function sleep(ms) {
 async function postToSheet(payload, { attempt = 1 } = {}) {
   try {
     await fetch(CONFIG.SHEET_API_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ ...payload, secret: CONFIG.SYNC_SECRET }),
     });
     return true;
@@ -20,10 +20,7 @@ async function postToSheet(payload, { attempt = 1 } = {}) {
       return postToSheet(payload, { attempt: attempt + 1 });
     }
     console.error(`Google Sheet sync failed after ${attempt} attempts:`, err);
-    showToast(
-      "Saved locally, but couldn't reach Google Sheets. Check your connection.",
-      "error",
-    );
+    showToast("Saved locally, but couldn't reach Google Sheets. Check your connection.", 'error');
     return false;
   }
 }
@@ -36,17 +33,17 @@ export function syncBookingToSheet(booking) {
     name: booking.name,
     // Space after the country code for readability in the sheet, e.g.
     // "+91 9876543210" instead of "+919876543210".
-    phone: `${booking.countryCode || "+91"} ${booking.phone}`,
-    date: booking.date || "",
-    occasion: booking.dayType || "",
-    status: booking.status || "",
+    phone: `${booking.countryCode || '+91'} ${booking.phone}`,
+    date: booking.date || '',
+    occasion: booking.dayType || '',
+    status: booking.status || '',
     createdAt: booking.createdAt || null,
-    email: booking.email || "",
+    email: booking.email || '',
   });
 }
 
 export function deleteBookingFromSheet(id) {
-  return postToSheet({ id, action: "delete" });
+  return postToSheet({ id, action: 'delete' });
 }
 
 // Country codes offered in the Add Devotee form (see the #countryCode
@@ -54,35 +51,48 @@ export function deleteBookingFromSheet(id) {
 // prefix below never stops early at a shorter code that happens to
 // also match (none currently overlap, but this keeps it correct even
 // if a code sharing a prefix is added later).
-const KNOWN_COUNTRY_CODES = ["+971", "+966", "+965", "+974", "+968", "+973", "+27", "+91", "+65", "+61", "+44", "+1"];
+const KNOWN_COUNTRY_CODES = [
+  '+971',
+  '+966',
+  '+965',
+  '+974',
+  '+968',
+  '+973',
+  '+27',
+  '+91',
+  '+65',
+  '+61',
+  '+44',
+  '+1',
+];
 
 // The sheet stores phone as one merged string (e.g. "+919876543210") since
 // that's simplest for a human glancing at the spreadsheet. The app's data
 // model needs country code and number as separate fields, so this splits
 // it back apart on the way in.
 function splitPhone(combined) {
-  const str = String(combined || "").trim();
+  const str = String(combined || '').trim();
   for (const code of KNOWN_COUNTRY_CODES) {
     if (str.startsWith(code)) {
       // Strip the code, then any space(s) left behind before the number.
-      return { countryCode: code, phone: str.slice(code.length).replace(/^\s+/, "") };
+      return { countryCode: code, phone: str.slice(code.length).replace(/^\s+/, '') };
     }
   }
   // Unknown/missing prefix: fall back to +91 rather than guessing, and
   // strip a leading "+" if present so the raw digits are at least usable.
-  return { countryCode: "+91", phone: str.replace(/^\+/, "").trim() };
+  return { countryCode: '+91', phone: str.replace(/^\+/, '').trim() };
 }
 
 function normalizeBooking(row) {
   const { countryCode, phone } = splitPhone(row.phone);
   return {
     id: row.id,
-    name: row.name || "",
+    name: row.name || '',
     phone,
     countryCode,
-    email: row.email || "",
-    dayType: row.dayType || "Friday",
-    status: row.status || "waiting",
+    email: row.email || '',
+    dayType: row.dayType || 'Friday',
+    status: row.status || 'waiting',
     date: row.date || null,
     createdAt: row.createdAt || null,
   };
@@ -104,8 +114,8 @@ export async function fetchBookingsFromSheet() {
   }
 
   const data = await response.json();
-  if (data.result !== "success") {
-    throw new Error(data.message || "Unknown error loading bookings from Google Sheets.");
+  if (data.result !== 'success') {
+    throw new Error(data.message || 'Unknown error loading bookings from Google Sheets.');
   }
 
   return (data.bookings || []).map(normalizeBooking);

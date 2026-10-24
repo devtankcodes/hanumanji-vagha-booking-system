@@ -4,17 +4,20 @@
    composite phone field, and validation error text.
    ========================================================= */
 
-input, select {
+input,
+select {
   width: 100%;
   padding: 12px;
   margin: 4px 0 0;
-  font-size: 16px; /* 16px avoids iOS Safari auto-zoom on focus */
+  font-size: 16px;
+  /* 16px avoids iOS Safari auto-zoom on focus */
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: #fff;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: 2px solid var(--blue);
   outline-offset: 1px;
 }
@@ -71,7 +74,8 @@ input.invalid {
   border: none;
   margin: 0;
   flex: 1;
-  min-width: 0; /* allows the input to shrink instead of overflowing on narrow screens */
+  min-width: 0;
+  /* allows the input to shrink instead of overflowing on narrow screens */
   padding: 12px 12px 12px 6px;
 }
 

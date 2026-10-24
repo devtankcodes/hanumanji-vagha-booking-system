@@ -1,0 +1,13 @@
+# Graphics & Brand Identity elements
+frontend/assets/
+*.ico
+*.png
+*.jpg
+*.svg
+
+# Search Engine & Index specifications
+sitemap.xml
+robots.txt
+
+# System structures
+.gitignore

@@ -1,0 +1,37 @@
+# http://editorconfig.org
+root = true
+
+# Global configurations for all source code
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Match the modular CSS and UI styling files
+[*.css]
+indent_style = space
+indent_size = 2
+max_line_length = 80
+
+# Keep vanilla JS components perfectly indented
+[*.js]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# Structural specifications for sitemaps, manifests, and web routing rules
+[*.{xml,json,webmanifest}]
+indent_style = space
+indent_size = 2
+
+# Documentation override (allows intentional trailing double-spaces for hard wraps)
+[*.md]
+trim_trailing_whitespace = false
+
+# Search Engine instructions and system txt models
+[robots.txt]
+trim_trailing_whitespace = false
+insert_final_newline = true

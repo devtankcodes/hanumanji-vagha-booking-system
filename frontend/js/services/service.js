@@ -1,30 +1,30 @@
-import { getBookings, setBookings } from "./state.js";
-import { capitalizeWords, normalizeEmail } from "./validators.js";
-import { syncBookingToSheet, deleteBookingFromSheet } from "./sheets-sync.js";
+import { getBookings, setBookings } from '../config/state.js';
+import { capitalizeWords, normalizeEmail } from '../utils/validators.js';
+import { syncBookingToSheet, deleteBookingFromSheet } from './sheets-sync.js';
 
 // Max devotees allowed on a single vagha date. Adjust to match real capacity.
 export const MAX_PER_DATE = 1;
 
-export function isPhoneAlreadyRegistered(phone, countryCode = "+91", excludeId = null) {
+export function isPhoneAlreadyRegistered(phone, countryCode = '+91', excludeId = null) {
   return getBookings().some(
     (b) =>
       b.phone === phone &&
-      (b.countryCode || "+91") === countryCode &&
-      b.status !== "cancelled" &&
+      (b.countryCode || '+91') === countryCode &&
+      b.status !== 'cancelled' &&
       b.id !== excludeId,
   );
 }
 
 export function isDateFull(date, excludeId = null) {
   const count = getBookings().filter(
-    (b) => b.status === "confirmed" && b.date === date && b.id !== excludeId,
+    (b) => b.status === 'confirmed' && b.date === date && b.id !== excludeId,
   ).length;
   return count >= MAX_PER_DATE;
 }
 
-export function addBooking({ name, phone, countryCode = "+91", email = "", dayType }) {
+export function addBooking({ name, phone, countryCode = '+91', email = '', dayType }) {
   if (isPhoneAlreadyRegistered(phone, countryCode)) {
-    throw new Error("This phone number is already registered.");
+    throw new Error('This phone number is already registered.');
   }
 
   const bookings = getBookings();
@@ -35,7 +35,7 @@ export function addBooking({ name, phone, countryCode = "+91", email = "", dayTy
     countryCode,
     email: normalizeEmail(email),
     dayType,
-    status: "waiting",
+    status: 'waiting',
     date: null,
     createdAt: Date.now(),
   };
@@ -48,18 +48,13 @@ export function addBooking({ name, phone, countryCode = "+91", email = "", dayTy
 export function updateBooking(id, { name, phone, countryCode, email, dayType }) {
   const bookings = getBookings();
   const target = bookings.find((b) => b.id === id);
-  const effectiveCountryCode = countryCode || (target ? target.countryCode : "+91") || "+91";
+  const effectiveCountryCode = countryCode || (target ? target.countryCode : '+91') || '+91';
 
   if (isPhoneAlreadyRegistered(phone, effectiveCountryCode, id)) {
-    throw new Error("This phone number is already registered.");
+    throw new Error('This phone number is already registered.');
   }
 
-  if (
-    target &&
-    target.status === "confirmed" &&
-    dayType &&
-    dayType !== target.dayType
-  ) {
+  if (target && target.status === 'confirmed' && dayType && dayType !== target.dayType) {
     throw new Error("Day type can't be changed after a booking is confirmed.");
   }
 
@@ -71,7 +66,7 @@ export function updateBooking(id, { name, phone, countryCode, email, dayType }) 
           phone: phone.trim(),
           ...(countryCode ? { countryCode } : {}),
           ...(email !== undefined ? { email: normalizeEmail(email) } : {}),
-          ...(b.status === "waiting" && dayType ? { dayType } : {}),
+          ...(b.status === 'waiting' && dayType ? { dayType } : {}),
         }
       : b,
   );
@@ -92,9 +87,7 @@ export function deleteBooking(id) {
 export function removeCompletedBookings() {
   const today = getTodayLocal();
   const bookings = getBookings();
-  const completed = bookings.filter(
-    (b) => b.status === "confirmed" && b.date < today,
-  );
+  const completed = bookings.filter((b) => b.status === 'confirmed' && b.date < today);
 
   if (completed.length === 0) return;
 
@@ -109,13 +102,11 @@ export function removeCompletedBookings() {
 
 export function assignBooking(id, date) {
   if (isDateFull(date, id)) {
-    throw new Error("That date is already fully booked. Please pick another.");
+    throw new Error('That date is already fully booked. Please pick another.');
   }
 
   const bookings = getBookings();
-  const updated = bookings.map((b) =>
-    b.id === id ? { ...b, date, status: "confirmed" } : b,
-  );
+  const updated = bookings.map((b) => (b.id === id ? { ...b, date, status: 'confirmed' } : b));
   setBookings(updated);
 
   const confirmedBooking = updated.find((b) => b.id === id);
@@ -141,15 +132,15 @@ export function getNextAvailableFriday() {
 }
 
 export function formatDate(date) {
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const year = date.getFullYear();
   return `${year}-${month}-${day}`;
 }
 
 export function formatDateDisplay(dateStr) {
-  if (!dateStr) return "";
-  const [year, month, day] = dateStr.split("-");
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('-');
   return `${day}-${month}-${year}`;
 }
 

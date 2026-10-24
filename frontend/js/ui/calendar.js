@@ -1,62 +1,64 @@
-import { getBookings } from "./state.js";
-import { getNextAvailableFriday, formatDate } from "./service.js";
+import { getBookings } from '../config/state.js';
+import { getNextAvailableFriday, formatDate } from '../services/service.js';
 
 let calendar = null;
 
 function truncateName(name, maxLen = 16) {
-  return name.length > maxLen ? name.slice(0, maxLen).trim() + "…" : name;
+  return name.length > maxLen ? name.slice(0, maxLen).trim() + '…' : name;
 }
 
 function getCalendarEvents() {
-  const confirmed = getBookings().filter(b => b.status === "confirmed");
+  const confirmed = getBookings().filter((b) => b.status === 'confirmed');
 
-  const confirmedEvents = confirmed.map(b => ({
+  const confirmedEvents = confirmed.map((b) => ({
     title: truncateName(b.name),
     start: b.date,
-    backgroundColor: b.dayType === "Friday" ? "#fef3c7" : "#dbeafe",
-    borderColor: b.dayType === "Friday" ? "#fef3c7" : "#dbeafe",
-    textColor: b.dayType === "Friday" ? "#92400e" : "#1e40af",
+    backgroundColor: b.dayType === 'Friday' ? '#fef3c7' : '#dbeafe',
+    borderColor: b.dayType === 'Friday' ? '#fef3c7' : '#dbeafe',
+    textColor: b.dayType === 'Friday' ? '#166534' : '#1e40af',
     extendedProps: {
-      fullName: b.name
-    }
+      fullName: b.name,
+    },
   }));
 
   // Highlights the whole cell for any date that has a confirmed booking.
   // Uses a Set so multiple bookings on the same date don't create
   // duplicate overlapping background events.
-  const confirmedDates = [...new Set(confirmed.map(b => b.date))];
-  const confirmedHighlights = confirmedDates.map(date => ({
+  const confirmedDates = [...new Set(confirmed.map((b) => b.date))];
+  const confirmedHighlights = confirmedDates.map((date) => ({
     start: date,
-    display: "background",
-    color: "#bbf7d0"
+    display: 'background',
+    color: '#bbf7d0',
   }));
 
   const nextFriday = getNextAvailableFriday();
   const highlightEvent = nextFriday
-    ? [{
-        start: nextFriday,
-        display: "background",
-        color: "#fde68a"
-      }]
+    ? [
+        {
+          start: nextFriday,
+          display: 'background',
+          color: '#fde68a',
+        },
+      ]
     : [];
 
   return [...confirmedEvents, ...confirmedHighlights, ...highlightEvent];
 }
 
 export function initCalendar() {
-  const el = document.getElementById("calendar");
-  if (!el || typeof FullCalendar === "undefined") return;
+  const el = document.getElementById('calendar');
+  if (!el || typeof FullCalendar === 'undefined') return;
 
   calendar = new FullCalendar.Calendar(el, {
-    initialView: "dayGridMonth",
+    initialView: 'dayGridMonth',
     selectable: false,
     fixedWeekCount: false,
     headerToolbar: {
-      left: "prev",
-      center: "title",
-      right: "next"
+      left: 'prev',
+      center: 'title',
+      right: 'next',
     },
-    height: "auto",
+    height: 'auto',
     dayMaxEventRows: 2,
     events: getCalendarEvents(),
     eventDidMount: (info) => {
@@ -69,9 +71,9 @@ export function initCalendar() {
       const nextFriday = getNextAvailableFriday();
       // formatDate (local) instead of toISOString (UTC) — same bug as the modal.
       if (nextFriday && formatDate(info.date) === nextFriday) {
-        info.el.classList.add("next-friday-cell");
+        info.el.classList.add('next-friday-cell');
       }
-    }
+    },
   });
 
   calendar.render();

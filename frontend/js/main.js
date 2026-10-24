@@ -1,21 +1,37 @@
-import { addBooking, deleteBooking, removeCompletedBookings } from "./service.js";
-import { getBookings, loadBookingsFromSheet } from "./state.js";
-import { render } from "./ui.js";
-import { isNameLongEnough, isNameShortEnough, hasOnlyLetterCharacters, isValidPhone, getEmailError, suggestEmailFix, sanitizeEmailInput, cleanPhoneInput, cleanNameInput, capitalizeWords, getPhoneErrorMessage, getPhoneMaxLength, getPhonePlaceholder, NAME_MIN_LENGTH, NAME_MAX_LENGTH } from "./validators.js";
-import { showToast, confirmDialog } from "./notifications.js";
-import { initModal, openModal } from "./modal.js";
-import { initEditModal, openEditModal } from "./edit-modal.js";
-import { initCalendar, refreshCalendar } from "./calendar.js";
+import { addBooking, deleteBooking, removeCompletedBookings } from './services/service.js';
+import { getBookings, loadBookingsFromSheet } from './config/state.js';
+import { render } from './ui/ui.js';
+import {
+  isNameLongEnough,
+  isNameShortEnough,
+  hasOnlyLetterCharacters,
+  isValidPhone,
+  getEmailError,
+  suggestEmailFix,
+  sanitizeEmailInput,
+  cleanPhoneInput,
+  cleanNameInput,
+  capitalizeWords,
+  getPhoneErrorMessage,
+  getPhoneMaxLength,
+  getPhonePlaceholder,
+  NAME_MIN_LENGTH,
+  NAME_MAX_LENGTH,
+} from './utils/validators.js';
+import { showToast, confirmDialog } from './ui/notifications.js';
+import { initModal, openModal } from './ui/modal.js';
+import { initEditModal, openEditModal } from './ui/edit-modal.js';
+import { initCalendar, refreshCalendar } from './ui/calendar.js';
 
-const form = document.getElementById("bookingForm");
-const nameInput = document.getElementById("name");
-const phoneInput = document.getElementById("phone");
-const countryCodeInput = document.getElementById("countryCode");
-const emailInput = document.getElementById("email");
-const dayTypeInput = document.getElementById("dayType");
-const nameError = document.getElementById("nameError");
-const phoneError = document.getElementById("phoneError");
-const emailError = document.getElementById("emailError");
+const form = document.getElementById('bookingForm');
+const nameInput = document.getElementById('name');
+const phoneInput = document.getElementById('phone');
+const countryCodeInput = document.getElementById('countryCode');
+const emailInput = document.getElementById('email');
+const dayTypeInput = document.getElementById('dayType');
+const nameError = document.getElementById('nameError');
+const phoneError = document.getElementById('phoneError');
+const emailError = document.getElementById('emailError');
 
 function refresh() {
   render({ onAssign: handleAssign, onDelete: handleDelete, onEdit: handleEdit });
@@ -24,18 +40,18 @@ function refresh() {
 
 function setFieldError(input, errorEl, message) {
   errorEl.textContent = message;
-  input.classList.toggle("invalid", Boolean(message));
+  input.classList.toggle('invalid', Boolean(message));
 }
 
 // The email the "Did you mean ...?" hint was already shown for. Showing it
 // once per address keeps it a hint, not a wall: submitting the same
 // address again keeps it as typed.
-let typoWarnedFor = "";
+let typoWarnedFor = '';
 
 function clearFieldErrors() {
-  setFieldError(nameInput, nameError, "");
-  setFieldError(phoneInput, phoneError, "");
-  setFieldError(emailInput, emailError, "");
+  setFieldError(nameInput, nameError, '');
+  setFieldError(phoneInput, phoneError, '');
+  setFieldError(emailInput, emailError, '');
 }
 
 function handleSubmit(e) {
@@ -51,10 +67,10 @@ function handleSubmit(e) {
   let hasError = false;
 
   if (!name) {
-    setFieldError(nameInput, nameError, "Enter full name.");
+    setFieldError(nameInput, nameError, 'Enter full name.');
     hasError = true;
   } else if (!hasOnlyLetterCharacters(name)) {
-    setFieldError(nameInput, nameError, "Name should contain only letters and spaces.");
+    setFieldError(nameInput, nameError, 'Name should contain only letters and spaces.');
     hasError = true;
   } else if (!isNameLongEnough(name)) {
     setFieldError(nameInput, nameError, `Name must be at least ${NAME_MIN_LENGTH} characters.`);
@@ -65,7 +81,7 @@ function handleSubmit(e) {
   }
 
   if (!phone) {
-    setFieldError(phoneInput, phoneError, "Phone number is required.");
+    setFieldError(phoneInput, phoneError, 'Phone number is required.');
     hasError = true;
   } else if (!isValidPhone(phone, countryCode)) {
     setFieldError(phoneInput, phoneError, getPhoneErrorMessage(countryCode));
@@ -80,7 +96,11 @@ function handleSubmit(e) {
     const suggestion = suggestEmailFix(email);
     if (suggestion && typoWarnedFor !== email) {
       typoWarnedFor = email;
-      setFieldError(emailInput, emailError, `Did you mean ${suggestion}? Correct it, or submit again to keep it as typed.`);
+      setFieldError(
+        emailInput,
+        emailError,
+        `Did you mean ${suggestion}? Correct it, or submit again to keep it as typed.`,
+      );
       hasError = true;
     }
   }
@@ -89,10 +109,10 @@ function handleSubmit(e) {
 
   try {
     addBooking({ name, phone, countryCode, email, dayType });
-    showToast(`${name} added to the waiting list.`, "success");
+    showToast(`${name} added to the waiting list.`, 'success');
     form.reset();
-    typoWarnedFor = "";
-    countryCodeInput.value = "+91";
+    typoWarnedFor = '';
+    countryCodeInput.value = '+91';
     updatePhoneMaxLength();
     clearFieldErrors();
     refresh();
@@ -110,14 +130,14 @@ function handleEdit(id) {
 }
 
 async function handleDelete(id) {
-  const booking = getBookings().find(b => b.id === id);
-  const label = booking ? booking.name : "this devotee";
+  const booking = getBookings().find((b) => b.id === id);
+  const label = booking ? booking.name : 'this devotee';
 
   const confirmed = await confirmDialog(`Delete ${label}'s booking?`);
   if (!confirmed) return;
 
   deleteBooking(id);
-  showToast(`${label}'s booking deleted.`, "success");
+  showToast(`${label}'s booking deleted.`, 'success');
   refresh();
 }
 
@@ -126,31 +146,31 @@ function updatePhoneMaxLength() {
   phoneInput.placeholder = getPhonePlaceholder(countryCodeInput.value);
 }
 
-phoneInput.addEventListener("input", () => {
+phoneInput.addEventListener('input', () => {
   phoneInput.value = cleanPhoneInput(phoneInput.value, countryCodeInput.value);
-  setFieldError(phoneInput, phoneError, "");
+  setFieldError(phoneInput, phoneError, '');
 });
 
-emailInput.addEventListener("input", () => {
+emailInput.addEventListener('input', () => {
   sanitizeEmailInput(emailInput);
-  setFieldError(emailInput, emailError, "");
+  setFieldError(emailInput, emailError, '');
 });
 
 // Check the address as soon as the user leaves the field, since stray
 // symbols are no longer removed automatically while typing.
-emailInput.addEventListener("blur", () => {
+emailInput.addEventListener('blur', () => {
   setFieldError(emailInput, emailError, getEmailError(emailInput.value.trim()));
 });
 
-countryCodeInput.addEventListener("change", () => {
+countryCodeInput.addEventListener('change', () => {
   updatePhoneMaxLength();
   phoneInput.value = cleanPhoneInput(phoneInput.value, countryCodeInput.value);
-  setFieldError(phoneInput, phoneError, "");
+  setFieldError(phoneInput, phoneError, '');
 });
 
 updatePhoneMaxLength();
 
-nameInput.addEventListener("input", () => {
+nameInput.addEventListener('input', () => {
   const cursorPos = nameInput.selectionStart;
   const original = nameInput.value;
   const cleaned = cleanNameInput(original);
@@ -159,15 +179,16 @@ nameInput.addEventListener("input", () => {
     // Characters may have been stripped before the cursor, so shift the
     // cursor back by however many were removed rather than pinning it
     // to the original position (which could now be past the new end).
-    const removedBeforeCursor = original.slice(0, cursorPos).length - cleanNameInput(original.slice(0, cursorPos)).length;
+    const removedBeforeCursor =
+      original.slice(0, cursorPos).length - cleanNameInput(original.slice(0, cursorPos)).length;
     nameInput.value = capitalized;
     const newPos = Math.max(0, cursorPos - removedBeforeCursor);
     nameInput.setSelectionRange(newPos, newPos);
   }
-  setFieldError(nameInput, nameError, "");
+  setFieldError(nameInput, nameError, '');
 });
 
-form.addEventListener("submit", handleSubmit);
+form.addEventListener('submit', handleSubmit);
 
 initModal({ onSuccess: refresh });
 initEditModal({ onSuccess: refresh });
@@ -179,22 +200,22 @@ initCalendar();
 // still unknown (avoids a confusing duplicate-looking entry once the
 // real data arrives).
 async function init() {
-  const addBtn = document.getElementById("addBtn");
+  const addBtn = document.getElementById('addBtn');
   addBtn.disabled = true;
-  addBtn.textContent = "Loading…";
+  addBtn.textContent = 'Loading…';
 
   try {
     await loadBookingsFromSheet();
   } catch (err) {
-    console.error("Failed to load bookings from Google Sheets:", err);
+    console.error('Failed to load bookings from Google Sheets:', err);
     showToast(
       "Couldn't load the devotee list from Google Sheets. Check your connection and reload.",
-      "error",
+      'error',
     );
   }
 
   addBtn.disabled = false;
-  addBtn.textContent = "Add Devotee";
+  addBtn.textContent = 'Add Devotee';
 
   removeCompletedBookings();
   refresh();
@@ -211,13 +232,13 @@ function setupCollapsibleSection(toggleId, listId) {
   const list = document.getElementById(listId);
   if (!toggle || !list) return;
 
-  toggle.addEventListener("click", () => {
-    const isExpanded = toggle.getAttribute("aria-expanded") === "true";
-    toggle.setAttribute("aria-expanded", String(!isExpanded));
-    toggle.closest(".card").classList.toggle("is-collapsed", isExpanded);
+  toggle.addEventListener('click', () => {
+    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!isExpanded));
+    toggle.closest('.card').classList.toggle('is-collapsed', isExpanded);
   });
 }
 
-setupCollapsibleSection("addToggle", "bookingForm");
-setupCollapsibleSection("confirmedToggle", "confirmedList");
-setupCollapsibleSection("waitingToggle", "waitingList");
+setupCollapsibleSection('addToggle', 'bookingForm');
+setupCollapsibleSection('confirmedToggle', 'confirmedList');
+setupCollapsibleSection('waitingToggle', 'waitingList');
