@@ -229,3 +229,62 @@ function escapeHtml_(value) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+// ---------------------------------------------------------------------
+// Diagnostics
+// ---------------------------------------------------------------------
+// DRY RUN: sends NOTHING and changes nothing. Run it from the editor
+// (pick checkReminderSetup in the function dropdown > Run), then read the
+// Execution log. It shows the setup and, row by row, why each devotee
+// would or would not get tomorrow's reminder.
+function checkReminderSetup() {
+  var tz = Session.getScriptTimeZone();
+  var tomorrow = getTomorrowIso_(tz);
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = REMINDER_CONFIG.SHEET_NAME
+    ? spreadsheet.getSheetByName(REMINDER_CONFIG.SHEET_NAME)
+    : spreadsheet.getActiveSheet();
+
+  Logger.log('Project time zone: %s (expected %s)', tz, REMINDER_CONFIG.REQUIRED_TIMEZONE);
+  Logger.log('Checking for booking date: %s', tomorrow);
+  Logger.log('Sheet tab being read: %s', sheet ? sheet.getName() : 'NOT FOUND - check SHEET_NAME');
+  Logger.log('Emails you can still send today: %s', MailApp.getRemainingDailyQuota());
+
+  var triggers = ScriptApp.getProjectTriggers().filter(function (t) {
+    return t.getHandlerFunction() === 'sendTomorrowReminder';
+  });
+  Logger.log('Daily reminder triggers installed: %s (should be 1)', triggers.length);
+
+  if (!sheet) return;
+
+  var rows = sheet.getDataRange().getValues();
+  var cols = getColumnIndexes(rows[0]);
+  var wouldSend = 0;
+
+  for (var i = 1; i < rows.length; i++) {
+    var row = rows[i];
+    if (!row[cols.id]) continue;
+
+    var status = (row[cols.status] || '').toString().toLowerCase();
+    var date = formatCellDate(row[cols.date]);
+    var email = String(row[cols.email] || '').trim();
+    var reason;
+
+    if (status !== 'confirmed') {
+      reason = 'skipped: status is "' + status + '", not confirmed';
+    } else if (date !== tomorrow) {
+      reason = 'skipped: booking date is "' + date + '", not ' + tomorrow;
+    } else if (isAlreadySent_(row[cols.emailSent])) {
+      reason = 'skipped: EMAIL_SENT already says "' + row[cols.emailSent] + '"';
+    } else if (!isPlausibleEmail_(email)) {
+      reason = 'skipped: no valid email on file ("' + email + '")';
+    } else {
+      reason = 'WOULD SEND a reminder';
+      wouldSend++;
+    }
+
+    Logger.log('Row %s | %s | %s', i + 1, row[cols.name], reason);
+  }
+
+  Logger.log('Done. Reminders that would be sent right now: %s', wouldSend);
+}

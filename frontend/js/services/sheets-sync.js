@@ -1,5 +1,6 @@
 import { CONFIG } from '../config/config.js';
 import { showToast } from '../ui/notifications.js';
+import { getIdToken } from '../auth.js';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -7,11 +8,12 @@ function sleep(ms) {
 
 async function postToSheet(payload, { attempt = 1 } = {}) {
   try {
+    const idToken = await getIdToken();
     await fetch(CONFIG.SHEET_API_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ ...payload, secret: CONFIG.SYNC_SECRET }),
+      body: JSON.stringify({ ...payload, idToken }),
     });
     return true;
   } catch (err) {
@@ -106,7 +108,8 @@ function normalizeBooking(row) {
 // browser console instead of data, double-check the deployment's access
 // setting is "Anyone", not "Anyone with Google account".
 export async function fetchBookingsFromSheet() {
-  const url = `${CONFIG.SHEET_API_URL}?secret=${encodeURIComponent(CONFIG.SYNC_SECRET)}`;
+  const idToken = await getIdToken();
+  const url = `${CONFIG.SHEET_API_URL}?idToken=${encodeURIComponent(idToken)}`;
   const response = await fetch(url);
 
   if (!response.ok) {

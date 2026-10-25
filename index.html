@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="auth-pending">
 
 <head>
 
@@ -24,6 +24,24 @@
   <!-- Link  CSS -->
   <link rel="stylesheet" href="frontend/css/main.css">
 
+  <!-- Hide the page until login is confirmed (visibility keeps layout, so the calendar sizes correctly) -->
+  <style>
+    html.auth-pending body {
+      visibility: hidden;
+    }
+
+    .logout-btn {
+      margin-left: auto;
+      padding: 8px 14px;
+      border: 1px solid #c75b00;
+      border-radius: 6px;
+      background: #fff;
+      color: #c75b00;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -32,6 +50,7 @@
     <img src="frontend/assets/logo.png" alt="Shree Chamatkarik Dham logo" class="app-logo" width="150" height="150"
       onerror="this.style.display='none'">
     <h1>Vagha Management</h1>
+    <button type="button" class="logout-btn" id="logoutBtn">Logout</button>
   </header>
 
   <div class="card card--add">
@@ -255,7 +274,16 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script type="module" src="frontend/js/main.js"></script>
+  <script type="module">
+    import { waitForUser, logout } from './frontend/js/auth.js';
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Wait for login first, so no devotee data is requested for logged-out visitors
+    await waitForUser();
+    document.documentElement.classList.remove('auth-pending');
+    await import('./frontend/js/main.js');
+  </script>
 
 </body>
 

@@ -35,7 +35,7 @@ function doPost(e) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = JSON.parse(e.postData.contents);
 
-    checkSecret(data);
+    verifyUser(data.idToken);
 
     if (!data.id) {
       throw new Error('Missing required field: id.');
@@ -132,7 +132,7 @@ function doPost(e) {
 function doGet(e) {
   try {
     var params = (e && e.parameter) || {};
-    checkSecret(params);
+    verifyUser(params.idToken);
 
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = sheet.getDataRange().getValues();
@@ -219,22 +219,70 @@ function findRowById(values, cols, id) {
   return null;
 }
 
-// Rejects the request unless it carries the shared secret configured in
-// Script Properties (Project Settings > Script Properties > SYNC_SECRET
-// in the Apps Script editor — NOT hardcoded here, so it never has to
-// live in the public GitHub repo).
-// This is a basic gatekeeping check, not full authentication: since the
-// frontend is a static site, the secret does ship to every visitor's
-// browser inside config.js. It stops casual/automated abuse of the bare
-// endpoint, but a determined visitor reading the JS source could still
-// find it. Real protection would require routing this call through a
-// server you control instead of hitting Apps Script directly.
-function checkSecret(data) {
-  var expected = PropertiesService.getScriptProperties().getProperty('SYNC_SECRET');
-  if (!expected) {
-    throw new Error('Server misconfigured: SYNC_SECRET is not set in Script Properties.');
-  }
-  if (data.secret !== expected) {
+// ---------------------------------------------------------------------
+// Authentication: Firebase ID token + email allowlist
+// ---------------------------------------------------------------------
+// The Firebase web API key identifies the project and is safe to be
+// public (it is already in frontend/js/auth.js).
+var FIREBASE_API_KEY = 'AIzaSyBA2EmXaFdCwMXmQYCkgcNflr1ZJ2PW5O8';
+
+// Rejects the request unless it carries a valid Firebase ID token that
+// belongs to an allowed staff email. Google verifies the token (signature,
+// expiry, project); we then check the email against ALLOWED_EMAILS, a
+// comma-separated list in Script Properties (Project Settings > Script
+// Properties), so the list never has to live in the public repo.
+// Fails closed: no allowlist configured means nobody gets in.
+function verifyUser(idToken) {
+  if (!idToken) {
     throw new Error('Unauthorized.');
   }
+
+  var allowedRaw = PropertiesService.getScriptProperties().getProperty('ALLOWED_EMAILS');
+  if (!allowedRaw) {
+    throw new Error('Server misconfigured: ALLOWED_EMAILS is not set in Script Properties.');
+  }
+  var allowed = allowedRaw.split(',').map(function (e) {
+    return e.trim().toLowerCase();
+  });
+
+  var cache = CacheService.getScriptCache();
+  var cacheKey =
+    'u_' +
+    Utilities.base64EncodeWebSafe(
+      Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, idToken),
+    );
+  var email = cache.get(cacheKey);
+
+  if (!email) {
+    var response = UrlFetchApp.fetch(
+      'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + FIREBASE_API_KEY,
+      {
+        method: 'post',
+        contentType: 'application/json',
+        payload: JSON.stringify({ idToken: idToken }),
+        muteHttpExceptions: true,
+      },
+    );
+    if (response.getResponseCode() !== 200) {
+      throw new Error('Unauthorized.');
+    }
+    var users = JSON.parse(response.getContentText()).users;
+    if (!users || !users[0] || !users[0].email) {
+      throw new Error('Unauthorized.');
+    }
+    email = String(users[0].email).toLowerCase();
+    cache.put(cacheKey, email, 300);
+  }
+
+  if (allowed.indexOf(email) === -1) {
+    throw new Error('Unauthorized.');
+  }
+  return email;
+}
+
+// Run this ONCE from the editor (select it in the function dropdown, click
+// Run) so Google asks you to approve the "connect to an external service"
+// permission that verifyUser() needs.
+function authorizeExternalRequests() {
+  UrlFetchApp.fetch('https://identitytoolkit.googleapis.com/', { muteHttpExceptions: true });
 }
