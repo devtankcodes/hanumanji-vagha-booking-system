@@ -1,7 +1,6 @@
 // =====================================================================
 // Reminders.gs — emails each devotee the evening before their Vagha seva
 //
-// Add as a NEW file in the same Apps Script project as Code.gs
 // (Editor > + > Script > "Reminders"). It reuses formatCellDate() from
 // Code.gs and does not touch doGet/doPost.
 //
@@ -21,6 +20,8 @@ var REMINDER_CONFIG = {
   HOUR: 21,
   MINUTE: 30,
   REQUIRED_TIMEZONE: 'Asia/Kolkata',
+  LOGO_URL:
+    'https://drive.usercontent.google.com/download?id=1wT1ChZocoC5rmFynQ6nY0EIL1VOeZnwx&export=view&authuser=0',
   VENUE: 'A.G. Chowk, Kalawad Road, Rajkot – 360005',
   INSTAGRAM_URL: 'https://www.instagram.com/shreechamatkarikdham/',
 };
@@ -101,7 +102,7 @@ function sendRemindersForDate_(targetIso, tz) {
   var dateLabel = Utilities.formatDate(
     new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])),
     tz,
-    'EEEE, dd-MM-yyyy',
+    'dd / MM / yyyy',
   );
 
   var result = { sent: [], noEmail: [], failed: [] };
@@ -118,7 +119,7 @@ function sendRemindersForDate_(targetIso, tz) {
     var booking = {
       name: String(row[cols.name] || ''),
       phone: String(row[cols.phone] || ''),
-      seva: row[cols.sevaType] === 'Friday' ? 'Friday Vagha Seva' : 'Special Day Vagha Seva',
+      seva: row[cols.sevaType] === 'Friday' ? 'Friday Vagha Seva' : 'Special Day Vagha',
       email: String(row[cols.email] || '').trim(),
     };
 
@@ -144,60 +145,359 @@ function sendRemindersForDate_(targetIso, tz) {
   return result;
 }
 
-function sendDevoteeEmail_(b, dateLabel) {
-  var venue = REMINDER_CONFIG.VENUE;
-  var insta = REMINDER_CONFIG.INSTAGRAM_URL;
+function sendDevoteeEmail_(booking, dateLabel) {
+  var subject = 'Reminder: Your Vagha Seva – ' + dateLabel;
 
   var options = {
-    to: b.email,
+    to: booking.email,
     name: REMINDER_CONFIG.SENDER_NAME,
-    subject: 'Vagha Seva Reminder — Tomorrow, ' + dateLabel,
-    body:
-      '🙏 Jai Siyaram, ' +
-      b.name +
-      ' ji,\n\n' +
-      'This is a gentle reminder that your Vagha seva at Shree Chamatkarik Hanumanji Mandir is tomorrow.\n\n' +
-      'Date: ' +
-      dateLabel +
-      '\n' +
-      'Seva: ' +
-      b.seva +
-      '\n' +
-      'Venue: ' +
-      venue +
-      '\n\n' +
-      'Your Vagha seva may be featured on our official Instagram page:\n' +
-      insta +
-      '\n\n' +
-      'For any queries or changes, please reply to this email.\n\n' +
-      '🙏 Jai Hanumanji Maharaj 🚩\n— Shree Chamatkarik Dham',
-    htmlBody:
-      "<div style='font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#222'>" +
-      '<p>🙏 Jai Siyaram, <b>' +
-      escapeHtml_(b.name) +
-      '</b> ji,</p>' +
-      '<p>This is a gentle reminder that your Vagha seva at <b>Shree Chamatkarik Hanumanji Mandir</b> is tomorrow.</p>' +
-      '<p>📅 <b>Date:</b> ' +
-      escapeHtml_(dateLabel) +
-      '<br>' +
-      '🕉️ <b>Seva:</b> ' +
-      escapeHtml_(b.seva) +
-      '<br>' +
-      '📍 <b>Venue:</b> ' +
-      escapeHtml_(venue) +
-      '</p>' +
-      '<p>📸 Your Vagha seva may be featured on our official Instagram page:<br>' +
-      "<a href='" +
-      insta +
-      "'>" +
-      insta +
-      '</a></p>' +
-      '<p>For any queries or changes, please reply to this email.</p>' +
-      '<p>🙏 Jai Hanumanji Maharaj 🚩<br>— <b>Shree Chamatkarik Dham</b></p></div>',
+    subject: subject,
+    body: buildReminderText_(booking, dateLabel),
+    htmlBody: buildReminderHtml_(booking, dateLabel),
   };
-  if (REMINDER_CONFIG.REPLY_TO_EMAIL) options.replyTo = REMINDER_CONFIG.REPLY_TO_EMAIL;
+
+  if (REMINDER_CONFIG.REPLY_TO_EMAIL) {
+    options.replyTo = REMINDER_CONFIG.REPLY_TO_EMAIL;
+  }
 
   MailApp.sendEmail(options);
+}
+
+// ---------------------------------------------------------------------
+// Plain-text email fallback
+// ---------------------------------------------------------------------
+function buildReminderText_(booking, dateLabel) {
+  return [
+    'Jai Siyaram, ' + booking.name + ' ji,',
+    '',
+    'This is a gentle reminder that your Vagha Seva at Shree Chamatkarik Hanumanji Mandir is scheduled for tomorrow.',
+    '',
+    'YOUR SEVA DETAILS',
+    'Seva Date: ' + dateLabel,
+    'Seva Type: ' + booking.seva,
+    'Reporting Time: ' + REMINDER_CONFIG.REPORTING_TIME,
+    'Location: ' + REMINDER_CONFIG.VENUE,
+    '',
+    'Please arrive on time for your seva.',
+    '',
+    'Instagram: ' + REMINDER_CONFIG.INSTAGRAM_URL,
+    '',
+    'For any queries or changes, please reply to this email.',
+    '',
+    'Jai Hanumanji Maharaj!',
+    'Shree Chamatkarik Dham',
+  ].join('\n');
+}
+
+// ---------------------------------------------------------------------
+// Professional HTML reminder email
+// ---------------------------------------------------------------------
+function buildReminderHtml_(booking, dateLabel) {
+  var name = escapeHtml_(booking.name);
+  var date = escapeHtml_(dateLabel);
+  var seva = escapeHtml_(booking.seva);
+  var venue = escapeHtml_(REMINDER_CONFIG.VENUE);
+
+  var insta = REMINDER_CONFIG.INSTAGRAM_URL;
+  var logo = REMINDER_CONFIG.LOGO_URL;
+
+  var mapsUrl = 'https://maps.app.goo.gl/4ysJ5XQeTw3BEwF27?g_st=ac';
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>Vagha Seva Reminder</title>
+
+  <style>
+    @media only screen and (max-width:480px) {
+      .email-header {
+        padding: 16px 12px !important;
+      }
+
+      .header-logo-cell {
+        width: 72px !important;
+        padding: 5px 10px 5px 0 !important;
+      }
+
+      .header-logo {
+        width: 62px !important;
+        height: 62px !important;
+      }
+
+      .header-title {
+        font-size: 18px !important;
+        line-height: 23px !important;
+      }
+
+      .header-subtitle {
+        font-size: 12px !important;
+        line-height: 18px !important;
+      }
+
+      .email-greeting {
+        font-size: 20px !important;
+        line-height: 27px !important;
+      }
+
+      .details-cell {
+        padding: 15px 14px !important;
+        font-size: 14px !important;
+        line-height: 20px !important;
+      }
+
+      .details-value {
+        font-size: 14px !important;
+        line-height: 20px !important;
+      }
+
+      .content-cell {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+      }
+    }
+  </style>
+</head>
+
+<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#292929;">
+
+  <!-- Preheader -->
+  <div style="display:none;font-size:1px;color:#f4f5f7;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+    A gentle reminder about your upcoming Vagha Seva.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+    style="background-color:#f4f5f7;">
+    <tr>
+      <td align="center" style="padding:30px 12px;">
+
+        <!-- Main Container -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+          style="width:100%;max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #eeeeee;">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" class="email-header"
+              style="padding:30px 24px;background-color:#f36b0b;background-image:linear-gradient(135deg,#f36b0b,#ff8c24);">
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="115" valign="middle" align="center"
+                    class="header-logo-cell"
+                    style="width:115px;padding:5px 15px 5px 0;">
+
+                    <img src="${logo}"
+                      alt="Shree Chamatkarik Dham Logo"
+                      width="100" height="100"
+                      class="header-logo"
+                      style="display:block;width:100px;height:100px;object-fit:contain;background:#ffffff;border-radius:50%;padding:5px;border:2px solid #ffe0bd;">
+                  </td>
+
+                  <td valign="middle" align="left">
+                    <div class="header-title"
+                      style="font-size:25px;line-height:33px;font-weight:700;color:#ffffff;">
+                      Shree Chamatkarik Dham
+                    </div>
+
+                    <div class="header-subtitle"
+                      style="font-size:16px;line-height:24px;color:#fff1df;padding-top:4px;">
+                      Hanumanji Mandir, Rajkot, Gujarat
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Main Content -->
+          <tr>
+            <td class="content-cell" style="padding:35px 32px 15px;">
+
+              <div class="email-greeting"
+                style="font-size:25px;line-height:34px;font-weight:700;color:#292929;">
+                🙏 Jai Siyaram, ${name} ji,
+              </div>
+
+              <p style="font-size:16px;line-height:26px;color:#555555;margin:18px 0 0;">
+                This is a gentle reminder that your
+                <strong style="color:#333333;">Vagha Seva</strong>
+                at
+                <strong style="color:#333333;">Shree Chamatkarik Hanumanji Mandir</strong>
+                is scheduled for tomorrow.
+              </p>
+
+              <!-- Reminder Badge -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+                style="margin-top:22px;">
+                <tr>
+                  <td style="background:#fff5e9;border:1px solid #f5d5ad;border-radius:20px;padding:7px 14px;">
+                    <span style="font-size:12px;font-weight:bold;color:#b45309;">
+                      ⏰ VAGHA SEVA REMINDER
+                    </span>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Seva Details -->
+          <tr>
+            <td class="content-cell" style="padding:15px 32px 10px;">
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="background:#fffaf5;border:1px solid #f3dfcc;border-radius:10px;">
+
+                <tr>
+                  <td colspan="2" style="padding:19px 20px 13px;">
+                    <div style="font-size:12px;letter-spacing:1.5px;font-weight:bold;color:#b45309;">
+                      YOUR SEVA DETAILS
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Seva Date -->
+                <tr>
+                  <td width="40%" valign="middle" class="details-cell"
+                    style="padding:13px 14px;font-size:13px;color:#777777;border-top:1px solid #f1e8df;">
+                    Seva Date
+                  </td>
+                  <td width="60%" align="right" valign="middle"
+                    class="details-cell details-value"
+                    style="padding:13px 14px;font-size:14px;font-weight:bold;color:#292929;border-top:1px solid #f1e8df;">
+                    ${date}
+                  </td>
+                </tr>
+
+                <!-- Seva Type -->
+                <tr>
+                  <td width="40%" valign="middle" class="details-cell"
+                    style="padding:13px 14px;font-size:13px;color:#777777;border-top:1px solid #f1e8df;">
+                    Seva Type
+                  </td>
+                  <td width="60%" align="right" valign="middle"
+                    class="details-cell details-value"
+                    style="padding:13px 14px;font-size:14px;font-weight:bold;color:#292929;border-top:1px solid #f1e8df;">
+                    ${seva}
+                  </td>
+                </tr>
+
+                <!-- Location -->
+                <tr>
+                  <td width="40%" valign="middle" class="details-cell"
+                    style="padding:13px 14px;font-size:13px;color:#777777;border-top:1px solid #f1e8df;">
+                    Location
+                  </td>
+                  <td width="60%" align="right" valign="middle"
+                    class="details-cell details-value"
+                    style="padding:13px 14px;font-size:13px;font-weight:bold;color:#292929;border-top:1px solid #f1e8df;">
+                    <a href="${mapsUrl}"
+                      target="_blank"
+                      style="color:#292929;text-decoration:none;">
+                      ${venue}
+                    </a>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Action Buttons -->
+          <tr>
+            <td align="center" style="padding:22px 20px 15px;">
+
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                <tr>
+                  <td align="center" style="padding:5px;">
+                    <a href="${insta}"
+                      style="display:inline-block;background:#ffffff;color:#c13584;text-decoration:none;font-size:14px;font-weight:bold;padding:14px 20px;border:1px solid #e5b5ce;border-radius:7px;"
+                      target="_blank">
+                      Instagram
+                    </a>
+                  </td>
+
+                  <td align="center" style="padding:5px;">
+                    <a href="${mapsUrl}"
+                      style="display:inline-block;background:#f36b0b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;padding:14px 20px;border-radius:7px;"
+                      target="_blank">
+                      Location
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Instagram Note -->
+          <tr>
+            <td class="content-cell" style="padding:15px 32px 10px;">
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="background:#fafafa;border:1px solid #eeeeee;border-radius:8px;">
+                <tr>
+                  <td style="padding:14px 16px;font-size:13px;line-height:22px;color:#777777;">
+                    📸 Your Vagha Seva may be featured on our official
+                    <a href="${insta}"
+                      style="color:#c45b18;text-decoration:none;font-weight:bold;"
+                      target="_blank">
+                      Instagram page
+                    </a>.
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Thank You -->
+          <tr>
+            <td class="content-cell" style="padding:25px 32px 35px;">
+
+              <p style="font-size:15px;line-height:25px;color:#555555;margin:15px 0 0;">
+                🙏 Thank you for your devotion and for being part of Shree Chamatkarik Dham.
+              </p>
+
+              <p style="font-size:16px;line-height:24px;font-weight:bold;color:#333333;margin:12px 0 0;">
+                Shree Chamatkarik Dham
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center"
+              style="background:#f7f7f7;border-top:1px solid #eeeeee;padding:20px;">
+
+              <div style="font-size:13px;line-height:23px;color:#666666;">
+                📍 Rajkot, Gujarat, India
+              </div>
+
+              <div style="margin-top:15px;font-size:12px;color:#999999;">
+                © 2026 Shree Chamatkarik Dham. All rights reserved.
+              </div>
+
+              <div style="margin-top:8px;font-size:11px;color:#aaaaaa;">
+                This is an automated Vagha Seva reminder email.
+              </div>
+
+            </td>
+          </tr>
+
+        </table>
+        <!-- End Main Container -->
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>`;
 }
 
 // EMAIL_SENT counts as "not sent yet" when blank or an obvious placeholder
