@@ -136,7 +136,11 @@ ul {
   border: 1px solid var(--border);
   color: var(--muted);
   flex-shrink: 0;
-  transition: transform var(--transition), background var(--transition), border-color var(--transition), color var(--transition);
+  transition:
+    transform var(--transition),
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
 }
 
 .chevron svg {
@@ -159,14 +163,14 @@ ul {
    Scoped to the svg rather than the circular badge itself, so the
    badge's hover scale/tap-scale transforms above don't fight with the
    rotation transform. */
-.section-toggle[aria-expanded="false"] .chevron svg {
+.section-toggle[aria-expanded='false'] .chevron svg {
   transform: rotate(-90deg);
 }
 
 /* The list itself is what actually hides — kept as a separate rule
    (rather than hiding the whole .card) so the heading + count badge
    stay visible and tappable while collapsed. */
-.card.is-collapsed>ul,
-.card.is-collapsed>form {
+.card.is-collapsed > ul,
+.card.is-collapsed > form {
   display: none !important;
 }

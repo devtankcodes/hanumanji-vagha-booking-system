@@ -1,10 +1,10 @@
 import { getBookings } from '../config/state.js';
-import { getNextAvailableFriday, formatDate } from '../services/service.js';
+import { formatDate, getNextAvailableFriday } from '../services/service.js';
 
 let calendar = null;
 
 function truncateName(name, maxLen = 16) {
-  return name.length > maxLen ? name.slice(0, maxLen).trim() + '…' : name;
+  return name.length > maxLen ? `${name.slice(0, maxLen).trim()}…` : name;
 }
 
 function getCalendarEvents() {

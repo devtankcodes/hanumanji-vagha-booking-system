@@ -1,290 +1,308 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="auth-pending">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
 
-<head>
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://script.google.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light">
+    <!-- Meta Tag -->
+    <meta name="description" content="Vagha booking management for Shree Chamatkarik Dham." />
 
-  <!-- Preconnect -->
-  <link rel="preconnect" href="https://script.google.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <!-- Page Title -->
+    <title>Vagha Management System</title>
+    <link rel="icon" type="image/png" href="frontend/assets/logo.png" />
 
-  <!-- Meta Tag -->
-  <meta name="description" content="Vagha booking management for Shree Chamatkarik Dham.">
+    <!-- Third-party CSS first, so our own stylesheets can override it -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 
-  <!-- Page Title -->
-  <title>Vagha Management System</title>
-  <link rel="icon" type="image/png" href="frontend/assets/logo.png">
+    <!-- Link  CSS -->
+    <link rel="stylesheet" href="frontend/css/main.css" />
 
-  <!-- Third-party CSS first, so our own stylesheets can override it -->
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+    <!-- Hide the page until login is confirmed (visibility keeps layout, so the calendar sizes correctly) -->
+    <style>
+      html.auth-pending body {
+        visibility: hidden;
+      }
 
-  <!-- Link  CSS -->
-  <link rel="stylesheet" href="frontend/css/main.css">
+      .logout-btn {
+        margin-left: auto;
+        padding: 8px 14px;
+        border: 1px solid #c75b00;
+        border-radius: 6px;
+        background: #fff;
+        color: #c75b00;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
 
-  <!-- Hide the page until login is confirmed (visibility keeps layout, so the calendar sizes correctly) -->
-  <style>
-    html.auth-pending body {
-      visibility: hidden;
-    }
+  <body>
+    <header class="app-header">
+      <img
+        src="frontend/assets/logo.png"
+        alt="Shree Chamatkarik Dham logo"
+        class="app-logo"
+        width="150"
+        height="150"
+        onerror="this.style.display = 'none'" />
+      <h1>Vagha Management</h1>
+      <button type="button" class="logout-btn" id="logoutBtn">Logout</button>
+    </header>
 
-    .logout-btn {
-      margin-left: auto;
-      padding: 8px 14px;
-      border: 1px solid #c75b00;
-      border-radius: 6px;
-      background: #fff;
-      color: #c75b00;
-      font-size: 14px;
-      cursor: pointer;
-    }
-  </style>
+    <div class="card card--add">
+      <button type="button" class="section-toggle" id="addToggle" aria-expanded="true" aria-controls="bookingForm">
+        <h2>
+          <span class="section-icon icon-add">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="16" y1="11" x2="22" y2="11" />
+            </svg>
+          </span>
+          Add Devotee
+        </h2>
 
-</head>
-
-<body>
-
-  <header class="app-header">
-    <img src="frontend/assets/logo.png" alt="Shree Chamatkarik Dham logo" class="app-logo" width="150" height="150"
-      onerror="this.style.display='none'">
-    <h1>Vagha Management</h1>
-    <button type="button" class="logout-btn" id="logoutBtn">Logout</button>
-  </header>
-
-  <div class="card card--add">
-
-    <button type="button" class="section-toggle" id="addToggle" aria-expanded="true" aria-controls="bookingForm">
-
-      <h2>
-        <span class="section-icon icon-add">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" aria-hidden="true">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <line x1="19" y1="8" x2="19" y2="14" />
-            <line x1="16" y1="11" x2="22" y2="11" />
+        <span class="chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
           </svg>
         </span>
-        Add Devotee
-      </h2>
+      </button>
 
-      <span class="chevron" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </span>
+      <form id="bookingForm" novalidate>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Full name" autocomplete="name" minlength="3" maxlength="50" required />
+        <p class="field-error" id="nameError"></p>
 
-    </button>
+        <label for="phone">Phone</label>
+        <div class="phone-field">
+          <select id="countryCode" class="country-code-select" aria-label="Country code">
+            <option value="+91" selected>+91</option>
+            <option value="+1">+1</option>
+            <option value="+44">+44</option>
+            <option value="+61">+61</option>
+            <option value="+65">+65</option>
+            <option value="+971">+971</option>
+            <option value="+966">+966</option>
+            <option value="+965">+965</option>
+            <option value="+974">+974</option>
+            <option value="+968">+968</option>
+            <option value="+973">+973</option>
+            <option value="+27">+27</option>
+          </select>
+          <input type="tel" id="phone" name="phone" inputmode="numeric" placeholder="10-digit number" maxlength="10" required />
+        </div>
+        <p class="field-error" id="phoneError"></p>
 
-    <form id="bookingForm" novalidate>
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" placeholder="Full name" autocomplete="name" minlength="3" maxlength="50"
-        required>
-      <p class="field-error" id="nameError"></p>
+        <label for="email">Email <span class="optional-label">(optional)</span></label>
+        <input
+          type="text"
+          id="email"
+          name="email"
+          placeholder="name@example.com"
+          autocomplete="email"
+          inputmode="email"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+          maxlength="100" />
+        <p class="field-error" id="emailError"></p>
 
-      <label for="phone">Phone</label>
-      <div class="phone-field">
-        <select id="countryCode" class="country-code-select" aria-label="Country code">
-          <option value="+91" selected>+91</option>
-          <option value="+1">+1</option>
-          <option value="+44">+44</option>
-          <option value="+61">+61</option>
-          <option value="+65">+65</option>
-          <option value="+971">+971</option>
-          <option value="+966">+966</option>
-          <option value="+965">+965</option>
-          <option value="+974">+974</option>
-          <option value="+968">+968</option>
-          <option value="+973">+973</option>
-          <option value="+27">+27</option>
+        <label for="dayType">Day Type</label>
+        <select id="dayType" name="dayType">
+          <option value="Friday" selected>Friday</option>
+          <option value="Special">Special Day</option>
         </select>
-        <input type="tel" id="phone" name="phone" inputmode="numeric" placeholder="10-digit number" maxlength="10"
-          required>
-      </div>
-      <p class="field-error" id="phoneError"></p>
 
-      <label for="email">Email <span class="optional-label">(optional)</span></label>
-      <input type="text" id="email" name="email" placeholder="name@example.com" autocomplete="email" inputmode="email"
-        autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="100">
-      <p class="field-error" id="emailError"></p>
-
-      <label for="dayType">Day Type</label>
-      <select id="dayType" name="dayType">
-        <option value="Friday" selected>Friday</option>
-        <option value="Special">Special Day</option>
-      </select>
-
-      <button type="submit" id="addBtn">Add Devotee</button>
-    </form>
-
-  </div>
-
-  <div class="card card--confirmed">
-
-    <button type="button" class="section-toggle" id="confirmedToggle" aria-expanded="true"
-      aria-controls="confirmedList">
-
-      <h2>
-        <span class="section-icon icon-confirmed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
-        </span>
-        Confirmed List
-        <span class="count" id="confirmedCount">0</span>
-      </h2>
-
-      <span class="chevron" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </span>
-
-    </button>
-
-    <ul id="confirmedList">
-      <li class="empty-state">No confirmed bookings yet.</li>
-    </ul>
-
-  </div>
-
-  <div class="card card--waiting is-collapsed">
-
-    <button type="button" class="section-toggle" id="waitingToggle" aria-expanded="false" aria-controls="waitingList">
-
-      <h2>
-        <span class="section-icon icon-waiting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="12 6 12 12 16 14" />
-          </svg>
-        </span>
-        Waiting List
-        <span class="count" id="waitingCount">0</span>
-      </h2>
-
-      <span class="chevron" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </span>
-
-    </button>
-
-    <ul id="waitingList">
-      <li class="empty-state">No one is waiting right now.</li>
-    </ul>
-
-  </div>
-
-  <div class="card card--calendar">
-
-    <h2>
-      <span class="section-icon icon-calendar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-        </svg>
-      </span>
-      Calendar View
-    </h2>
-
-    <div id="calendar"></div>
-    <div class="calendar-legend">
-      <span class="legend-item"><span class="legend-dot legend-dot--today"></span>Today</span>
-      <span class="legend-item"><span class="legend-dot legend-dot--next"></span>Next available Friday</span>
-      <span class="legend-item"><span class="legend-dot legend-dot--booked"></span>Confirmed booking</span>
+        <button type="submit" id="addBtn">Add Devotee</button>
+      </form>
     </div>
 
-  </div>
+    <div class="card card--confirmed">
+      <button type="button" class="section-toggle" id="confirmedToggle" aria-expanded="true" aria-controls="confirmedList">
+        <h2>
+          <span class="section-icon icon-confirmed"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </span>
+          Confirmed List
+          <span class="count" id="confirmedCount">0</span>
+        </h2>
 
-  <!-- MODAL -->
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-content">
+        <span class="chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
+      </button>
 
-      <h3 id="modalTitle">Select Date</h3>
-      <p class="modal-hint" id="modalSuggestion"></p>
-      <label for="modalDate">Vagha date</label>
-      <input type="date" id="modalDate">
-      <p class="field-error" id="modalDateError"></p>
-
-      <div class="modal-actions">
-        <button type="button" id="confirmDateBtn">Confirm Booking</button>
-        <button type="button" id="cancelDateBtn" class="secondary">Cancel</button>
-      </div>
-
+      <ul id="confirmedList">
+        <li class="empty-state">No confirmed bookings yet.</li>
+      </ul>
     </div>
-  </div>
 
-  <!-- EDIT MODAL -->
-  <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
-    <div class="modal-content">
-      <h3 id="editModalTitle">Edit Devotee</h3>
+    <div class="card card--waiting is-collapsed">
+      <button type="button" class="section-toggle" id="waitingToggle" aria-expanded="false" aria-controls="waitingList">
+        <h2>
+          <span class="section-icon icon-waiting"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </span>
+          Waiting List
+          <span class="count" id="waitingCount">0</span>
+        </h2>
 
-      <label for="editName">Name</label>
-      <input type="text" id="editName" autocomplete="name" minlength="3" maxlength="50">
-      <p class="field-error" id="editNameError"></p>
+        <span class="chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
+      </button>
 
-      <label for="editPhone">Phone</label>
-      <div class="phone-field">
-        <select id="editCountryCode" class="country-code-select" aria-label="Country code">
-          <option value="+91" selected>+91</option>
-          <option value="+1">+1</option>
-          <option value="+44">+44</option>
-          <option value="+61">+61</option>
-          <option value="+65">+65</option>
-          <option value="+971">+971</option>
-          <option value="+966">+966</option>
-          <option value="+965">+965</option>
-          <option value="+974">+974</option>
-          <option value="+968">+968</option>
-          <option value="+973">+973</option>
-          <option value="+27">+27</option>
+      <ul id="waitingList">
+        <li class="empty-state">No one is waiting right now.</li>
+      </ul>
+    </div>
+
+    <div class="card card--calendar">
+      <h2>
+        <span class="section-icon icon-calendar">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+        </span>
+        Calendar View
+      </h2>
+
+      <div id="calendar"></div>
+      <div class="calendar-legend">
+        <span class="legend-item"><span class="legend-dot legend-dot--today"></span>Today</span>
+        <span class="legend-item"><span class="legend-dot legend-dot--next"></span>Next available Friday</span>
+        <span class="legend-item"><span class="legend-dot legend-dot--booked"></span>Confirmed booking</span>
+      </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-content">
+        <h3 id="modalTitle">Select Date</h3>
+        <p class="modal-hint" id="modalSuggestion"></p>
+        <label for="modalDate">Vagha date</label>
+        <input type="date" id="modalDate" />
+        <p class="field-error" id="modalDateError"></p>
+
+        <div class="modal-actions">
+          <button type="button" id="confirmDateBtn">Confirm Booking</button>
+          <button type="button" id="cancelDateBtn" class="secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+      <div class="modal-content">
+        <h3 id="editModalTitle">Edit Devotee</h3>
+
+        <label for="editName">Name</label>
+        <input type="text" id="editName" autocomplete="name" minlength="3" maxlength="50" />
+        <p class="field-error" id="editNameError"></p>
+
+        <label for="editPhone">Phone</label>
+        <div class="phone-field">
+          <select id="editCountryCode" class="country-code-select" aria-label="Country code">
+            <option value="+91" selected>+91</option>
+            <option value="+1">+1</option>
+            <option value="+44">+44</option>
+            <option value="+61">+61</option>
+            <option value="+65">+65</option>
+            <option value="+971">+971</option>
+            <option value="+966">+966</option>
+            <option value="+965">+965</option>
+            <option value="+974">+974</option>
+            <option value="+968">+968</option>
+            <option value="+973">+973</option>
+            <option value="+27">+27</option>
+          </select>
+          <input type="tel" id="editPhone" inputmode="numeric" placeholder="10-digit number" maxlength="10" />
+        </div>
+        <p class="field-error" id="editPhoneError"></p>
+
+        <label for="editEmail">Email <span class="optional-label">(optional)</span></label>
+        <input
+          type="text"
+          id="editEmail"
+          inputmode="email"
+          placeholder="name@example.com"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+          maxlength="100" />
+        <p class="field-error" id="editEmailError"></p>
+
+        <label for="editDayType">Day Type</label>
+        <select id="editDayType">
+          <option value="Friday">Friday</option>
+          <option value="Special">Special Day</option>
         </select>
-        <input type="tel" id="editPhone" inputmode="numeric" placeholder="10-digit number" maxlength="10">
+
+        <div class="modal-actions">
+          <button type="button" id="saveEditBtn">Save Changes</button>
+          <button type="button" id="cancelEditBtn" class="secondary">Cancel</button>
+        </div>
       </div>
-      <p class="field-error" id="editPhoneError"></p>
-
-      <label for="editEmail">Email <span class="optional-label">(optional)</span></label>
-      <input type="text" id="editEmail" inputmode="email" placeholder="name@example.com" autocapitalize="none"
-        autocorrect="off" spellcheck="false" maxlength="100">
-      <p class="field-error" id="editEmailError"></p>
-
-      <label for="editDayType">Day Type</label>
-      <select id="editDayType">
-        <option value="Friday">Friday</option>
-        <option value="Special">Special Day</option>
-      </select>
-
-      <div class="modal-actions">
-        <button type="button" id="saveEditBtn">Save Changes</button>
-        <button type="button" id="cancelEditBtn" class="secondary">Cancel</button>
-      </div>
-
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script type="module">
-    import { waitForUser, logout } from './frontend/js/auth.js';
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script type="module">
+      import { waitForUser, logout } from './frontend/js/auth.js';
 
-    document.getElementById('logoutBtn').addEventListener('click', logout);
+      document.getElementById('logoutBtn').addEventListener('click', logout);
 
-    // Wait for login first, so no devotee data is requested for logged-out visitors
-    await waitForUser();
-    document.documentElement.classList.remove('auth-pending');
-    await import('./frontend/js/main.js');
-  </script>
-
-</body>
-
+      // Wait for login first, so no devotee data is requested for logged-out visitors
+      await waitForUser();
+      document.documentElement.classList.remove('auth-pending');
+      await import('./frontend/js/main.js');
+    </script>
+  </body>
 </html>

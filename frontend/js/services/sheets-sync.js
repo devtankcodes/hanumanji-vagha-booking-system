@@ -1,6 +1,6 @@
+import { getIdToken } from '../auth.js';
 import { CONFIG } from '../config/config.js';
 import { showToast } from '../ui/notifications.js';
-import { getIdToken } from '../auth.js';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

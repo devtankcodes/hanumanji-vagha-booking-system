@@ -1,27 +1,27 @@
-import { addBooking, deleteBooking, removeCompletedBookings } from './services/service.js';
 import { getBookings, loadBookingsFromSheet } from './config/state.js';
+import { addBooking, deleteBooking, removeCompletedBookings } from './services/service.js';
+import { initCalendar, refreshCalendar } from './ui/calendar.js';
+import { initEditModal, openEditModal } from './ui/edit-modal.js';
+import { initModal, openModal } from './ui/modal.js';
+import { confirmDialog, showToast } from './ui/notifications.js';
 import { render } from './ui/ui.js';
 import {
-  isNameLongEnough,
-  isNameShortEnough,
-  hasOnlyLetterCharacters,
-  isValidPhone,
-  getEmailError,
-  suggestEmailFix,
-  sanitizeEmailInput,
-  cleanPhoneInput,
-  cleanNameInput,
   capitalizeWords,
+  cleanNameInput,
+  cleanPhoneInput,
+  getEmailError,
   getPhoneErrorMessage,
   getPhoneMaxLength,
   getPhonePlaceholder,
-  NAME_MIN_LENGTH,
+  hasOnlyLetterCharacters,
+  isNameLongEnough,
+  isNameShortEnough,
+  isValidPhone,
   NAME_MAX_LENGTH,
+  NAME_MIN_LENGTH,
+  sanitizeEmailInput,
+  suggestEmailFix,
 } from './utils/validators.js';
-import { showToast, confirmDialog } from './ui/notifications.js';
-import { initModal, openModal } from './ui/modal.js';
-import { initEditModal, openEditModal } from './ui/edit-modal.js';
-import { initCalendar, refreshCalendar } from './ui/calendar.js';
 
 const form = document.getElementById('bookingForm');
 const nameInput = document.getElementById('name');

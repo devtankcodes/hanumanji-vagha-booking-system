@@ -1,11 +1,11 @@
+import { getBookings } from '../config/state.js';
 import {
   assignBooking,
-  getNextAvailableFriday,
-  isDateFull,
-  getTodayLocal,
   formatDateDisplay,
+  getNextAvailableFriday,
+  getTodayLocal,
+  isDateFull,
 } from '../services/service.js';
-import { getBookings } from '../config/state.js';
 import { showToast } from './notifications.js';
 
 let selectedId = null;

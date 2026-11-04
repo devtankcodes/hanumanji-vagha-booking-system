@@ -123,7 +123,7 @@
 }
 
 .next-friday-cell::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 6px;
   right: 6px;

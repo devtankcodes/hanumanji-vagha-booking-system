@@ -1,9 +1,9 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js';
 import {
   getAuth,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js';
 
 // Paste your config from Firebase Console → Project settings → Your apps → Web app

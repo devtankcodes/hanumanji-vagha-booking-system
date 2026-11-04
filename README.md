@@ -1,10 +1,10 @@
 # 🙏 Hanumanji Vagha Booking System
 
-A lightweight, login-protected booking tracker for **Shree Chamatkarik
-Hanumanji Mandir's** weekly and special Vagha days: waiting list, confirmed
-list, a visual calendar, one-tap WhatsApp confirmations and automatic email
-reminders. Data lives in a Google Sheet, so the temple admin can manage
-everything from a spreadsheet they already know.
+A lightweight, login-protected booking tracker for **Shree Chamatkarik Hanumanji
+Mandir's** weekly and special Vagha days: waiting list, confirmed list, a visual
+calendar, one-tap WhatsApp confirmations and automatic email reminders. Data
+lives in a Google Sheet, so the temple admin can manage everything from a
+spreadsheet they already know.
 
 ![Frontend](<https://img.shields.io/badge/frontend-vanilla%20JS%20(ES%20modules)-f7df1e>)
 ![Build](https://img.shields.io/badge/build%20step-none-success)
@@ -37,8 +37,8 @@ everything from a spreadsheet they already know.
 
 ## Overview
 
-Temple staff sign in, then add devotees to a **waiting list** with a name,
-phone number and optional email. Assigning a Vagha date moves a devotee to the
+Temple staff sign in, then add devotees to a **waiting list** with a name, phone
+number and optional email. Assigning a Vagha date moves a devotee to the
 **confirmed list**. The app suggests the next available Friday, prevents
 double-booking a date or a phone number, and generates a ready-to-send WhatsApp
 confirmation. A calendar shows every confirmed date at a glance, and a daily
@@ -88,8 +88,8 @@ Only staff whose email is on an allowlist can read or change any data.
 - **Assign** a Vagha date with a smart "next available Friday" suggestion, a
   Friday-only check for Friday-type bookings, and a per-date capacity check
 - Duplicate-phone and duplicate-date protection
-- Confirmed list highlights the soonest upcoming booking and offers a
-  **one-tap WhatsApp confirmation** (date, seva, venue, Instagram link)
+- Confirmed list highlights the soonest upcoming booking and offers a **one-tap
+  WhatsApp confirmation** (date, seva, venue, Instagram link)
 - **Calendar view** (FullCalendar) with confirmed dates and the next available
   Friday highlighted
 - **Delete** with a named confirmation prompt and toast feedback
@@ -99,15 +99,15 @@ Only staff whose email is on an allowlist can read or change any data.
 
 ## Tech Stack
 
-| Layer          | Choice                                                         |
-| -------------- | -------------------------------------------------------------- |
-| Frontend       | Vanilla JavaScript (ES modules), no framework, no build step   |
-| Styling        | Plain CSS split by concern (`base`, `layout`, `forms`, etc.)   |
-| Calendar       | [FullCalendar 6](https://fullcalendar.io/) via CDN             |
-| Authentication | [Firebase Authentication](https://firebase.google.com/) (web)  |
-| Data store     | Google Sheets via a Google Apps Script Web App                 |
-| Reminders      | Apps Script time-driven trigger + `MailApp`                    |
-| Hosting        | GitHub Pages (any static host works)                           |
+| Layer          | Choice                                                        |
+| -------------- | ------------------------------------------------------------- |
+| Frontend       | Vanilla JavaScript (ES modules), no framework, no build step  |
+| Styling        | Plain CSS split by concern (`base`, `layout`, `forms`, etc.)  |
+| Calendar       | [FullCalendar 6](https://fullcalendar.io/) via CDN            |
+| Authentication | [Firebase Authentication](https://firebase.google.com/) (web) |
+| Data store     | Google Sheets via a Google Apps Script Web App                |
+| Reminders      | Apps Script time-driven trigger + `MailApp`                   |
+| Hosting        | GitHub Pages (any static host works)                          |
 
 ## Project Structure
 
@@ -191,7 +191,8 @@ The script uses the sheet's active tab.
 
 ### 2. Firebase
 
-1. Create a project at [console.firebase.google.com](https://console.firebase.google.com).
+1. Create a project at
+   [console.firebase.google.com](https://console.firebase.google.com).
 2. Add a **Web app** (`</>` icon). Skip Firebase Hosting. Copy the
    `firebaseConfig` values into `frontend/js/auth.js`.
 3. Keep the two SDK imports at the top of `auth.js` on the **same version**
@@ -203,7 +204,7 @@ The script uses the sheet's active tab.
 6. **Authentication → Settings → User actions:** turn **off** _Enable create
    (sign-up)_ so nobody can self-register.
 7. **Authentication → Settings → Authorized domains:** add your hosting domain,
-   for example `<username>.github.io`.
+   for example `devtankcodes.github.io`.
 
 ### 3. Apps Script
 
@@ -213,15 +214,15 @@ The script uses the sheet's active tab.
    you want email reminders.
 3. In `Code.gs`, set `FIREBASE_API_KEY` to your Firebase web API key (the same
    `apiKey` as in `auth.js`; it is not a secret).
-4. **Project Settings → Script properties → Add property:**
-   `ALLOWED_EMAILS` = comma-separated staff emails, for example
-   `a@example.com, b@example.com`. Without this property nobody is allowed in.
+4. **Project Settings → Script properties → Add property:** `ALLOWED_EMAILS` =
+   comma-separated staff emails, for example `a@example.com, b@example.com`.
+   Without this property nobody is allowed in.
 5. Select the `authorizeExternalRequests` function in the editor and click
    **Run** once. Approve the permission prompt (the script contacts Google to
    verify tokens).
-6. **Deploy → New deployment → Web app:** _Execute as_ **Me**, _Who has
-   access_ **Anyone**. (It must be Anyone because the browser calls it directly;
-   the Firebase token check is what protects the data.) Copy the Web app URL.
+6. **Deploy → New deployment → Web app:** _Execute as_ **Me**, _Who has access_
+   **Anyone**. (It must be Anyone because the browser calls it directly; the
+   Firebase token check is what protects the data.) Copy the Web app URL.
 
 ### 4. Frontend config
 
@@ -247,8 +248,8 @@ Saving alone does not change the live app.
 1. In `Reminders.gs`, edit `REMINDER_CONFIG` (sender name, reply-to address,
    venue, Instagram link, send time).
 2. Set the Apps Script **Project Settings → Time zone** to `Asia/Kolkata`.
-3. Run `setupDailyReminderTrigger` once. It installs a daily trigger (about
-   9:30 PM) and is safe to re-run.
+3. Run `setupDailyReminderTrigger` once. It installs a daily trigger (about 9:30
+   PM) and is safe to re-run.
 4. Each row's `EMAIL_SENT` cell records who was already emailed, so a retried
    run never double-sends. Devotees without an email on file are skipped.
 
@@ -262,34 +263,34 @@ Adding someone needs **both** steps, or they cannot use the app:
 1. Create their account in **Firebase → Authentication → Users**.
 2. Add their email to `ALLOWED_EMAILS` in **Apps Script → Script properties**.
 
-To remove someone, delete them from the allowlist (immediate, apart from a
-short cache of up to 5 minutes) and disable or delete their Firebase user.
+To remove someone, delete them from the allowlist (immediate, apart from a short
+cache of up to 5 minutes) and disable or delete their Firebase user.
 
 ## Customizing
 
-| What                          | Where                                       |
-| ----------------------------- | ------------------------------------------- |
-| Devotees allowed per date     | `MAX_PER_DATE` in `services/service.js`     |
-| WhatsApp message and venue    | Template in `services/whatsapp.js`          |
-| Reminder email text and time  | `REMINDER_CONFIG` and body in `Reminders.gs`|
-| Country codes and phone rules | `PHONE_RULES` in `utils/validators.js`      |
-| Colors and layout             | `frontend/css/`                             |
+| What                          | Where                                        |
+| ----------------------------- | -------------------------------------------- |
+| Devotees allowed per date     | `MAX_PER_DATE` in `services/service.js`      |
+| WhatsApp message and venue    | Template in `services/whatsapp.js`           |
+| Reminder email text and time  | `REMINDER_CONFIG` and body in `Reminders.gs` |
+| Country codes and phone rules | `PHONE_RULES` in `utils/validators.js`       |
+| Colors and layout             | `frontend/css/`                              |
 
 Country codes are also listed in the `<select>` elements in `index.html` (the
 add form and the edit modal).
 
 ## Validation Rules
 
-| Field                | Rule                                                           |
-| -------------------- | -------------------------------------------------------------- |
-| Name                 | Letters and spaces only, 3–50 characters, auto-capitalized     |
-| Phone (`+91`)        | Exactly 10 digits, starting with 6–9                           |
-| Phone (other codes)  | Per-country rules for `+1 +44 +61 +65 +27 +965 +966 +968 +971 +973 +974`; a general length check for any other code |
-| Email                | Optional; validated, stored lowercase, typo hint for common domains |
-| Phone uniqueness     | One active booking per phone number + country code             |
-| Date capacity        | One confirmed booking per date by default                      |
-| Friday bookings      | Must be assigned to a Friday                                   |
-| Day type             | Editable only while the booking is waiting                     |
+| Field               | Rule                                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Name                | Letters and spaces only, 3–50 characters, auto-capitalized                                                          |
+| Phone (`+91`)       | Exactly 10 digits, starting with 6–9                                                                                |
+| Phone (other codes) | Per-country rules for `+1 +44 +61 +65 +27 +965 +966 +968 +971 +973 +974`; a general length check for any other code |
+| Email               | Optional; validated, stored lowercase, typo hint for common domains                                                 |
+| Phone uniqueness    | One active booking per phone number + country code                                                                  |
+| Date capacity       | One confirmed booking per date by default                                                                           |
+| Friday bookings     | Must be assigned to a Friday                                                                                        |
+| Day type            | Editable only while the booking is waiting                                                                          |
 
 ## Deployment
 
@@ -298,12 +299,14 @@ add form and the edit modal).
 1. Push the repo to GitHub.
 2. **Settings → Pages:** Source `Deploy from a branch`, branch `main`, folder
    `/ (root)`.
-3. The site goes live at `https://<username>.github.io/<repo-name>/`.
-4. Add `<username>.github.io` to Firebase **Authorized domains** (see Setup).
+3. The site goes live at
+   `https://devtankcodes.github.io/hanumanji-vagha-booking-system/`.
+4. Add `devtankcodes.github.io` to Firebase **Authorized domains** (see Setup).
 
 Use relative paths for any new files (for example `frontend/js/...`, not
-`/frontend/js/...`), because a project site is served from `/<repo-name>/`.
-Hard-refresh (`Ctrl+Shift+R`) after pushing if you still see old files.
+`/frontend/js/...`), because a project site is served from
+`/hanummanji-vagha-booking-system/`. Hard-refresh (`Ctrl+Shift+R`) after pushing
+if you still see old files.
 
 ## Security Model
 
@@ -322,16 +325,16 @@ Hard-refresh (`Ctrl+Shift+R`) after pushing if you still see old files.
 
 ## Troubleshooting
 
-| Symptom | Likely cause and fix |
-| ------- | -------------------- |
+| Symptom                                                    | Likely cause and fix                                                                                                                                                                                                 |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Login form reloads and the URL shows `?email=…&password=…` | The page script failed to load, so the form submitted normally. Check the Console for the real error and that the import path in `login.html` is `./frontend/js/auth.js`. Change that account's password afterwards. |
-| `Component auth has not been registered yet` | `firebase-app.js` and `firebase-auth.js` imports in `auth.js` use different versions. Make them identical. |
-| `auth/invalid-credential` | Wrong email or password, or the user does not exist in Firebase. |
-| `Failed to load bookings… Unauthorized.` | Token rejected. Check that the email is in `ALLOWED_EMAILS`, that you ran `authorizeExternalRequests`, and that the **deployed** version has your latest code (new version, or a new deployment and URL). |
-| `Server misconfigured: ALLOWED_EMAILS is not set` | Add the `ALLOWED_EMAILS` Script Property. |
-| CORS error loading bookings | The deployment's access must be **Anyone**, not "Anyone with a Google account". |
-| Page blank, then redirects to login | Not signed in, or the domain is missing from Firebase Authorized domains. |
-| Calendar renders with the wrong size | Do not hide the page with `display: none`; the app uses `visibility` for this reason. |
+| `Component auth has not been registered yet`               | `firebase-app.js` and `firebase-auth.js` imports in `auth.js` use different versions. Make them identical.                                                                                                           |
+| `auth/invalid-credential`                                  | Wrong email or password, or the user does not exist in Firebase.                                                                                                                                                     |
+| `Failed to load bookings… Unauthorized.`                   | Token rejected. Check that the email is in `ALLOWED_EMAILS`, that you ran `authorizeExternalRequests`, and that the **deployed** version has your latest code (new version, or a new deployment and URL).            |
+| `Server misconfigured: ALLOWED_EMAILS is not set`          | Add the `ALLOWED_EMAILS` Script Property.                                                                                                                                                                            |
+| CORS error loading bookings                                | The deployment's access must be **Anyone**, not "Anyone with a Google account".                                                                                                                                      |
+| Page blank, then redirects to login                        | Not signed in, or the domain is missing from Firebase Authorized domains.                                                                                                                                            |
+| Calendar renders with the wrong size                       | Do not hide the page with `display: none`; the app uses `visibility` for this reason.                                                                                                                                |
 
 ## Known Limitations
 
@@ -361,5 +364,5 @@ Hard-refresh (`Ctrl+Shift+R`) after pushing if you still see old files.
 
 ## License
 
-No license file is currently included, so all rights are reserved by the
-project owner. Add a `LICENSE` file if you intend to open-source this.
+No license file is currently included, so all rights are reserved by the project
+owner. Add a `LICENSE` file if you intend to open-source this.

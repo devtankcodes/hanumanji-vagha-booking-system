@@ -1,6 +1,6 @@
 import { getBookings } from '../config/state.js';
-import { getWhatsAppLink } from '../services/whatsapp.js';
 import { formatDateDisplay, getTodayLocal } from '../services/service.js';
+import { getWhatsAppLink } from '../services/whatsapp.js';
 import { icons } from '../utils/icons.js';
 
 /**
@@ -22,7 +22,7 @@ function getNextUpcomingId(confirmed) {
 
 function buildEntry(item, { showDate, actions, highlight }) {
   const entry = document.createElement('div');
-  entry.className = 'entry' + (highlight ? ' entry-next' : '');
+  entry.className = `entry${highlight ? ' entry-next' : ''}`;
 
   const info = document.createElement('div');
   info.className = 'entry-info';

@@ -1,6 +1,6 @@
 import { getBookings, setBookings } from '../config/state.js';
 import { capitalizeWords, normalizeEmail } from '../utils/validators.js';
-import { syncBookingToSheet, deleteBookingFromSheet } from './sheets-sync.js';
+import { deleteBookingFromSheet, syncBookingToSheet } from './sheets-sync.js';
 
 // Max devotees allowed on a single vagha date. Adjust to match real capacity.
 export const MAX_PER_DATE = 1;

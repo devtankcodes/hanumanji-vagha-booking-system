@@ -12,7 +12,10 @@ button {
   font-weight: 600;
   letter-spacing: 0.2px;
   cursor: pointer;
-  transition: transform var(--transition), filter var(--transition), box-shadow var(--transition);
+  transition:
+    transform var(--transition),
+    filter var(--transition),
+    box-shadow var(--transition);
   display: inline-flex;
   align-items: center;
   justify-content: center;

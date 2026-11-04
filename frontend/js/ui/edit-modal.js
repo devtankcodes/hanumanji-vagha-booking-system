@@ -1,22 +1,22 @@
 import { getBookings } from '../config/state.js';
 import { updateBooking } from '../services/service.js';
 import {
-  isNameLongEnough,
-  isNameShortEnough,
-  hasOnlyLetterCharacters,
-  isValidPhone,
-  getEmailError,
-  suggestEmailFix,
-  sanitizeEmailInput,
-  cleanEmailInput,
-  cleanPhoneInput,
-  cleanNameInput,
   capitalizeWords,
+  cleanEmailInput,
+  cleanNameInput,
+  cleanPhoneInput,
+  getEmailError,
   getPhoneErrorMessage,
   getPhoneMaxLength,
   getPhonePlaceholder,
-  NAME_MIN_LENGTH,
+  hasOnlyLetterCharacters,
+  isNameLongEnough,
+  isNameShortEnough,
+  isValidPhone,
   NAME_MAX_LENGTH,
+  NAME_MIN_LENGTH,
+  sanitizeEmailInput,
+  suggestEmailFix,
 } from '../utils/validators.js';
 import { showToast } from './notifications.js';
 
