@@ -1,8 +1,6 @@
+
 /* =========================================================
-   calendar.css
-   Overrides for the third-party FullCalendar widget. Kept in
-   its own file since these rules are tightly coupled to
-   FullCalendar's own class names and version.
+   CALENDAR STYLING
    ========================================================= */
 
 #calendar {
@@ -10,7 +8,8 @@
   margin-top: 14px;
 }
 
-/* Header toolbar: nav buttons + month title */
+/* Header */
+
 .fc .fc-toolbar-title {
   font-size: var(--font-lg);
   font-weight: 700;
@@ -35,7 +34,8 @@
   background: #9ca3af;
 }
 
-/* Grid + borders */
+/* Grid */
+
 .fc-theme-standard td,
 .fc-theme-standard th {
   border-color: #e5e7eb;
@@ -47,7 +47,8 @@
   overflow: hidden;
 }
 
-/* Weekday header row (Sun, Mon, ...) */
+/* Weekday header */
+
 .fc .fc-col-header-cell {
   background: #f9fafb;
   padding: 8px 0;
@@ -63,6 +64,7 @@
 }
 
 /* Day cells */
+
 .fc .fc-daygrid-day-frame {
   padding: 4px;
   height: 70px;
@@ -80,7 +82,8 @@
   color: #cbd5e1;
 }
 
-/* Today: subtle tint instead of FullCalendar's default bright yellow */
+/* TODAY - BLUE */
+
 .fc .fc-day-today {
   background: #eff6ff !important;
 }
@@ -90,7 +93,15 @@
   font-weight: 700;
 }
 
-/* Confirmed-booking events: quiet pill instead of a solid color block */
+/* CONFIRMED DATE - GREEN */
+
+.fc .confirmed-date-cell .fc-daygrid-day-number {
+  color: #15803d !important;
+  font-weight: 700;
+}
+
+/* Confirmed booking event */
+
 .fc-daygrid-event {
   border: none;
   border-radius: 6px;
@@ -112,30 +123,19 @@
   white-space: normal;
 }
 
-/* Next-available-Friday highlight on the calendar */
+/* NEXT AVAILABLE FRIDAY - AMBER */
+
 .next-friday-cell {
   position: relative;
 }
 
-.next-friday-cell .fc-daygrid-day-number {
+.fc .next-friday-cell .fc-daygrid-day-number {
   font-weight: 700;
-  color: #b45309;
+  color: #b45309 !important;
 }
 
-.next-friday-cell::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--saffron);
-}
+/* Calendar legend */
 
-/* Legend explaining the calendar's color coding, so the meaning of
-   the today-tint / next-Friday-dot / booking-pill isn't left for the
-   user to guess. */
 .calendar-legend {
   display: flex;
   flex-wrap: wrap;

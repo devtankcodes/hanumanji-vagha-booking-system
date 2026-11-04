@@ -1,37 +1,48 @@
+
 import { getBookings } from '../config/state.js';
 import { formatDate, getNextAvailableFriday } from '../services/service.js';
 
 let calendar = null;
 
 function truncateName(name, maxLen = 16) {
-  return name.length > maxLen ? `${name.slice(0, maxLen).trim()}…` : name;
+  return name.length > maxLen
+    ? `${name.slice(0, maxLen).trim()}…`
+    : name;
 }
 
 function getCalendarEvents() {
-  const confirmed = getBookings().filter((b) => b.status === 'confirmed');
+  const confirmed = getBookings().filter(
+    (booking) => booking.status === 'confirmed',
+  );
 
-  const confirmedEvents = confirmed.map((b) => ({
-    title: truncateName(b.name),
-    start: b.date,
-    backgroundColor: b.dayType === 'Friday' ? '#fef3c7' : '#dbeafe',
-    borderColor: b.dayType === 'Friday' ? '#fef3c7' : '#dbeafe',
-    textColor: b.dayType === 'Friday' ? '#166534' : '#1e40af',
+  const confirmedEvents = confirmed.map((booking) => ({
+    title: truncateName(booking.name),
+    start: booking.date,
+    backgroundColor:
+      booking.dayType === 'Friday' ? '#fef3c7' : '#dbeafe',
+    borderColor:
+      booking.dayType === 'Friday' ? '#fef3c7' : '#dbeafe',
+    textColor:
+      booking.dayType === 'Friday' ? '#166534' : '#1e40af',
     extendedProps: {
-      fullName: b.name,
+      fullName: booking.name,
     },
   }));
 
-  // Highlights the whole cell for any date that has a confirmed booking.
-  // Uses a Set so multiple bookings on the same date don't create
-  // duplicate overlapping background events.
-  const confirmedDates = [...new Set(confirmed.map((b) => b.date))];
+  // Highlight confirmed dates in green.
+  const confirmedDates = [
+    ...new Set(confirmed.map((booking) => booking.date)),
+  ];
+
   const confirmedHighlights = confirmedDates.map((date) => ({
     start: date,
     display: 'background',
     color: '#bbf7d0',
   }));
 
+  // Highlight next available Friday in amber.
   const nextFriday = getNextAvailableFriday();
+
   const highlightEvent = nextFriday
     ? [
         {
@@ -42,37 +53,66 @@ function getCalendarEvents() {
       ]
     : [];
 
-  return [...confirmedEvents, ...confirmedHighlights, ...highlightEvent];
+  return [
+    ...confirmedEvents,
+    ...confirmedHighlights,
+    ...highlightEvent,
+  ];
 }
 
 export function initCalendar() {
   const el = document.getElementById('calendar');
+
   if (!el || typeof FullCalendar === 'undefined') return;
 
   calendar = new FullCalendar.Calendar(el, {
     initialView: 'dayGridMonth',
     selectable: false,
     fixedWeekCount: false,
+
     headerToolbar: {
       left: 'prev',
       center: 'title',
       right: 'next',
     },
+
     height: 'auto',
     dayMaxEventRows: 2,
     events: getCalendarEvents(),
+
     eventDidMount: (info) => {
       const fullName = info.event.extendedProps.fullName;
+
       if (fullName) {
         info.el.title = fullName;
       }
     },
-    dayCellDidMount: (info) => {
-      const nextFriday = getNextAvailableFriday();
-      // formatDate (local) instead of toISOString (UTC) — same bug as the modal.
-      if (nextFriday && formatDate(info.date) === nextFriday) {
-        info.el.classList.add('next-friday-cell');
+
+    dayCellClassNames: (info) => {
+      const date = formatDate(info.date);
+
+      const confirmedDates = new Set(
+        getBookings()
+          .filter(
+            (booking) =>
+              booking.status === 'confirmed' && booking.date,
+          )
+          .map((booking) => booking.date),
+      );
+
+      const classNames = [];
+
+      // Confirmed date: green.
+      if (confirmedDates.has(date)) {
+        classNames.push('confirmed-date-cell');
       }
+
+      // Next available Friday: amber.
+      if (date === getNextAvailableFriday()) {
+        classNames.push('next-friday-cell');
+      }
+
+      return classNames;
     },
   });
 
@@ -81,6 +121,7 @@ export function initCalendar() {
 
 export function refreshCalendar() {
   if (!calendar) return;
+
   calendar.removeAllEvents();
   calendar.addEventSource(getCalendarEvents());
   calendar.render();
