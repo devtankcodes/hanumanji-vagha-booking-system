@@ -1,445 +1,450 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#fff7ed" />
 
-    <title>Login | Hanumanji Vagha Management</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#fff7ed" />
 
-    <style>
-      :root {
-        color-scheme: light;
-        --primary: #d66a0a;
-        --primary-hover: #b95700;
-        --primary-soft: #fff0dc;
-        --text: #1f2937;
-        --text-muted: #64748b;
-        --border: #d7dce3;
-        --danger: #b42318;
-        --focus: #fb923c;
+  <title>Login | Hanumanji Vagha Management</title>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #d66a0a;
+      --primary-hover: #b95700;
+      --primary-soft: #fff0dc;
+      --text: #1f2937;
+      --text-muted: #64748b;
+      --border: #c9d0da;
+      --danger: #b42318;
+      --focus: #fb923c;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.8), transparent 38%),
+        linear-gradient(145deg, #fff7ed 0%, #ffedd5 48%, #fed7aa 100%);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 390px;
+      padding: 32px;
+      background: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 22px;
+      box-shadow:
+        0 20px 55px rgba(124, 65, 15, 0.1),
+        0 4px 12px rgba(31, 41, 55, 0.05);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 36px;
+      text-align: center;
+    }
+
+    .brand-logo {
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      padding: 7px;
+      overflow: hidden;
+      background: #fffaf2;
+      border: 1px solid #ffdfb0;
+      border-radius: 22px;
+      box-shadow: 0 5px 16px rgba(198, 93, 0, 0.08);
+    }
+
+    .brand-logo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(21px, 5vw, 25px);
+      line-height: 1.3;
+      letter-spacing: -0.6px;
+      font-weight: 750;
+    }
+
+    .subtitle {
+      margin: 7px 0 0;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 19px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      font: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+    }
+
+    .form-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .form-input:hover {
+      border-color: #aeb7c4;
+    }
+
+    .form-input:focus-visible {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.18);
+    }
+
+    .password-input {
+      padding-right: 52px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition:
+        color 160ms ease,
+        background 160ms ease;
+    }
+
+    .password-toggle svg {
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
+
+    .password-toggle .icon-eye-off {
+      display: none;
+    }
+
+    .password-toggle.is-visible .icon-eye {
+      display: none;
+    }
+
+    .password-toggle.is-visible .icon-eye-off {
+      display: block;
+    }
+
+    /* Hide browser-specific password reveal controls */
+    input::-ms-reveal,
+    input::-ms-clear {
+      display: none;
+    }
+
+    /* Hide native password decorations in WebKit browsers */
+    input::-webkit-credentials-auto-fill-button {
+      visibility: hidden;
+      display: none !important;
+    }
+
+    .login-button {
+      width: 100%;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 8px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        background 160ms ease,
+        transform 160ms ease,
+        box-shadow 160ms ease;
+    }
+
+    .login-button:hover:not(:disabled) {
+      background: var(--primary-hover);
+      box-shadow: 0 5px 14px rgba(198, 93, 0, 0.2);
+    }
+
+    .login-button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .login-button:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .login-button:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 700ms linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
+    }
+
+    .error-message {
+      margin: 12px 0 0;
+      color: var(--danger);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .error-message:empty {
+      display: none;
+    }
+
+    .security-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin: 24px 0 0;
+      padding-top: 18px;
+      border-top: 1px solid #f0f1f3;
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .security-note svg {
+      flex-shrink: 0;
+      color: #15803d;
+    }
+
+    @media (max-width: 420px) {
+      .login-card {
+        padding: 26px 22px;
+        border-radius: 18px;
+      }
+
+      .brand {
+        margin-bottom: 30px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
 
       *,
       *::before,
       *::after {
-        box-sizing: border-box;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
       }
+    }
+  </style>
+</head>
 
-      body {
-        margin: 0;
-        min-height: 100vh;
-        min-height: 100dvh;
-        display: grid;
-        place-items: center;
-        padding: 24px 16px;
-        font-family:
-          Inter,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          sans-serif;
-        color: var(--text);
-        background:
-          radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.8), transparent 38%),
-          linear-gradient(145deg, #fff7ed 0%, #ffedd5 48%, #fed7aa 100%);
-      }
+<body>
+  <main class="login-card">
+    <header class="brand">
+      <div class="brand-logo">
+        <img src="frontend/assets/logo.png" alt="Hanumanji Temple logo" width="150" height="150" fetchpriority="high" />
+      </div>
 
-      .login-card {
-        width: 100%;
-        max-width: 390px;
-        padding: 32px;
-        background: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.9);
-        border-radius: 22px;
-        box-shadow:
-          0 20px 55px rgba(124, 65, 15, 0.1),
-          0 4px 12px rgba(31, 41, 55, 0.05);
-      }
+      <div>
+        <h1>Vagha Management</h1>
+      </div>
+    </header>
 
-      .brand {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 30px;
-        text-align: center;
-      }
+    <form id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="email"> Email address </label>
 
-      .brand-logo {
-        width: 76px;
-        height: 76px;
-        display: grid;
-        place-items: center;
-        padding: 7px;
-        overflow: hidden;
-        background: #fffaf2;
-        border: 1px solid #ffdfb0;
-        border-radius: 22px;
-        box-shadow: 0 5px 16px rgba(198, 93, 0, 0.08);
-      }
+        <input class="form-input" type="email" id="email" name="email" placeholder="Enter your email"
+          autocomplete="username" autocapitalize="none" spellcheck="false" required />
+      </div>
 
-      .brand-logo img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
+      <div class="form-group">
+        <label class="form-label" for="password"> Password </label>
 
-      h1 {
-        margin: 0;
-        font-size: clamp(21px, 5vw, 25px);
-        line-height: 1.3;
-        letter-spacing: -0.6px;
-        font-weight: 750;
-      }
+        <div class="input-wrap">
+          <input class="form-input password-input" type="password" id="password" name="password"
+            placeholder="Enter your password" autocomplete="current-password" required />
 
-      .subtitle {
-        margin: 7px 0 0;
-        color: var(--text-muted);
-        font-size: 14px;
-        line-height: 1.6;
-      }
-
-      .form-group {
-        margin-bottom: 19px;
-      }
-
-      .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #374151;
-      }
-
-      .input-wrap {
-        position: relative;
-      }
-
-      .form-input {
-        width: 100%;
-        min-height: 48px;
-        padding: 12px 14px;
-        font: inherit;
-        font-size: 15px;
-        color: var(--text);
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        outline: none;
-        transition:
-          border-color 160ms ease,
-          box-shadow 160ms ease;
-      }
-
-      .form-input::placeholder {
-        color: #9ca3af;
-      }
-
-      .form-input:hover {
-        border-color: #aeb7c4;
-      }
-
-      .form-input:focus-visible {
-        border-color: var(--focus);
-        box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.18);
-      }
-
-      .password-input {
-        padding-right: 70px;
-      }
-
-      .password-toggle {
-        position: absolute;
-        top: 50%;
-        right: 8px;
-        transform: translateY(-50%);
-        padding: 8px;
-        border: none;
-        border-radius: 6px;
-        background: transparent;
-        color: var(--text-muted);
-        font: inherit;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-      }
-
-      .password-toggle:hover {
-        color: var(--primary);
-        background: var(--primary-soft);
-      }
-
-      .password-toggle:focus-visible {
-        outline: 2px solid var(--focus);
-        outline-offset: 2px;
-      }
-
-      /* Hide browser-specific password reveal controls */
-      input::-ms-reveal,
-      input::-ms-clear {
-        display: none;
-      }
-
-      /* Hide native password decorations in WebKit browsers */
-      input::-webkit-credentials-auto-fill-button {
-        visibility: hidden;
-        display: none !important;
-      }
-
-      .login-button {
-        width: 100%;
-        min-height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 8px;
-        padding: 12px 16px;
-        border: none;
-        border-radius: 10px;
-        background: var(--primary);
-        color: #fff;
-        font: inherit;
-        font-size: 15px;
-        font-weight: 700;
-        cursor: pointer;
-        transition:
-          background 160ms ease,
-          transform 160ms ease,
-          box-shadow 160ms ease;
-      }
-
-      .login-button:hover:not(:disabled) {
-        background: var(--primary-hover);
-        box-shadow: 0 5px 14px rgba(198, 93, 0, 0.2);
-      }
-
-      .login-button:active:not(:disabled) {
-        transform: translateY(1px);
-      }
-
-      .login-button:focus-visible {
-        outline: 3px solid var(--focus);
-        outline-offset: 3px;
-      }
-
-      .login-button:disabled {
-        opacity: 0.7;
-        cursor: wait;
-      }
-
-      .spinner {
-        width: 16px;
-        height: 16px;
-        border: 2px solid rgba(255, 255, 255, 0.45);
-        border-top-color: #fff;
-        border-radius: 50%;
-        animation: spin 700ms linear infinite;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      .error-message {
-        margin: 12px 0 0;
-        color: var(--danger);
-        font-size: 13px;
-        line-height: 1.5;
-        text-align: center;
-      }
-
-      .error-message:empty {
-        display: none;
-      }
-
-      .security-note {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 7px;
-        margin: 24px 0 0;
-        padding-top: 18px;
-        border-top: 1px solid #f0f1f3;
-        color: var(--text-muted);
-        font-size: 12px;
-        text-align: center;
-      }
-
-      .security-note svg {
-        flex-shrink: 0;
-        color: #15803d;
-      }
-
-      @media (max-width: 420px) {
-        .login-card {
-          padding: 26px 22px;
-          border-radius: 18px;
-        }
-
-        .brand {
-          margin-bottom: 26px;
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-          animation-duration: 0.01ms !important;
-          transition-duration: 0.01ms !important;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <main class="login-card">
-      <header class="brand">
-        <div class="brand-logo">
-          <img src="frontend/assets/logo.png" alt="Hanumanji Temple logo" width="150" height="150" fetchpriority="high" />
+          <button class="password-toggle" type="button" id="passwordToggle" aria-controls="password"
+            aria-label="Show password" aria-pressed="false">
+            <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+              <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c6.5 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+              <path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3.5 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+              <line x1="2" y1="2" x2="22" y2="22" />
+            </svg>
+          </button>
         </div>
+      </div>
 
-        <div>
-          <h1>Vagha Management</h1>
-          <p class="subtitle">Authorized temple staff only</p>
-        </div>
-      </header>
+      <button class="login-button" type="submit" id="loginBtn">
+        <span id="loginBtnText">Sign in securely</span>
+      </button>
 
-      <form id="loginForm">
-        <div class="form-group">
-          <label class="form-label" for="email"> Email address </label>
+      <p class="error-message" id="error" role="alert" aria-live="polite"></p>
+    </form>
 
-          <input
-            class="form-input"
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Enter your email"
-            autocomplete="username"
-            autocapitalize="none"
-            spellcheck="false"
-            required />
-        </div>
+    <footer class="security-note">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4" y="10" width="16" height="11" rx="2" />
+        <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+      </svg>
+      Secure access for authorized staff
+    </footer>
+  </main>
 
-        <div class="form-group">
-          <label class="form-label" for="password"> Password </label>
+  <script type="module">
+    import { login, redirectIfLoggedIn } from './frontend/js/auth.js';
 
-          <div class="input-wrap">
-            <input
-              class="form-input password-input"
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Enter your password"
-              autocomplete="current-password"
-              required />
+    redirectIfLoggedIn('index.html');
 
-            <button class="password-toggle" type="button" id="passwordToggle" aria-controls="password" aria-label="Show password">
-              Show
-            </button>
-          </div>
-        </div>
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const passwordToggle = document.getElementById('passwordToggle');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginBtnText = document.getElementById('loginBtnText');
+    const errorEl = document.getElementById('error');
 
-        <button class="login-button" type="submit" id="loginBtn">
-          <span id="loginBtnText">Sign in securely</span>
-        </button>
+    passwordToggle.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
 
-        <p class="error-message" id="error" role="alert" aria-live="polite"></p>
-      </form>
+      passwordInput.type = isPassword ? 'text' : 'password';
+      passwordToggle.classList.toggle('is-visible', isPassword);
 
-      <footer class="security-note">
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true">
-          <rect x="4" y="10" width="16" height="11" rx="2" />
-          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-        </svg>
-        Secure access for authorized staff
-      </footer>
-    </main>
+      passwordToggle.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+      passwordToggle.setAttribute('aria-pressed', String(isPassword));
+    });
 
-    <script type="module">
-      import { login, redirectIfLoggedIn } from './frontend/js/auth.js';
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-      redirectIfLoggedIn('index.html');
+      if (loginBtn.disabled) return;
 
-      const form = document.getElementById('loginForm');
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
-      const passwordToggle = document.getElementById('passwordToggle');
-      const loginBtn = document.getElementById('loginBtn');
-      const loginBtnText = document.getElementById('loginBtnText');
-      const errorEl = document.getElementById('error');
+      errorEl.textContent = '';
+      loginBtn.disabled = true;
+      loginBtn.setAttribute('aria-busy', 'true');
 
-      passwordToggle.addEventListener('click', () => {
-        const isPassword = passwordInput.type === 'password';
+      const spinner = document.createElement('span');
+      spinner.className = 'spinner';
+      spinner.setAttribute('aria-hidden', 'true');
 
-        passwordInput.type = isPassword ? 'text' : 'password';
-        passwordToggle.textContent = isPassword ? 'Hide' : 'Show';
+      loginBtnText.textContent = 'Signing in...';
+      loginBtn.prepend(spinner);
 
-        passwordToggle.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
-      });
+      try {
+        await login(emailInput.value.trim(), passwordInput.value);
 
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        if (loginBtn.disabled) return;
-
-        errorEl.textContent = '';
-        loginBtn.disabled = true;
-        loginBtn.setAttribute('aria-busy', 'true');
-
-        const spinner = document.createElement('span');
-        spinner.className = 'spinner';
-        spinner.setAttribute('aria-hidden', 'true');
-
-        loginBtnText.textContent = 'Signing in...';
-        loginBtn.prepend(spinner);
-
-        try {
-          await login(emailInput.value.trim(), passwordInput.value);
-
-          window.location.replace('index.html');
-        } catch (error) {
-          errorEl.textContent = friendlyError(error?.code);
-        } finally {
-          spinner.remove();
-          loginBtn.disabled = false;
-          loginBtn.removeAttribute('aria-busy');
-          loginBtnText.textContent = 'Sign in securely';
-        }
-      });
-
-      function friendlyError(code) {
-        switch (code) {
-          case 'auth/invalid-credential':
-          case 'auth/wrong-password':
-          case 'auth/user-not-found':
-            return 'Invalid email or password.';
-
-          case 'auth/too-many-requests':
-            return 'Too many attempts. Try again later.';
-
-          case 'auth/network-request-failed':
-            return 'Network error. Check your internet connection.';
-
-          default:
-            return 'Login failed. Please try again.';
-        }
+        window.location.replace('index.html');
+      } catch (error) {
+        errorEl.textContent = friendlyError(error?.code);
+      } finally {
+        spinner.remove();
+        loginBtn.disabled = false;
+        loginBtn.removeAttribute('aria-busy');
+        loginBtnText.textContent = 'Sign in securely';
       }
-    </script>
-  </body>
+    });
+
+    function friendlyError(code) {
+      switch (code) {
+        case 'auth/invalid-credential':
+        case 'auth/wrong-password':
+        case 'auth/user-not-found':
+          return 'Invalid email or password.';
+
+        case 'auth/too-many-requests':
+          return 'Too many attempts. Try again later.';
+
+        case 'auth/network-request-failed':
+          return 'Network error. Check your internet connection.';
+
+        default:
+          return 'Login failed. Please try again.';
+      }
+    }
+  </script>
+</body>
+
 </html>
