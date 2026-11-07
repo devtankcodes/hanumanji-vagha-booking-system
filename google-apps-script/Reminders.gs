@@ -210,7 +210,11 @@ function buildReminderHtml_(booking, dateLabel) {
     `Reschedule Request: ${booking.seva} (${booking.name})`,
   );
   var rescheduleBody = encodeURIComponent(
-    `Jai Siyaram,\n\nI need to change my ${booking.seva} date currently scheduled for ${dateLabel}.\n\nMy preferred new date is: \nReason (optional): \n\nDevotee Name: ${booking.name}`,
+    `Jai Siyaram,\n\nI would like to request a date change for my upcoming Seva.\n\n` +
+    `• Devotee Name: ${booking.name}\n` +
+    `• Seva Type: ${booking.seva}\n` +
+    `• Current Scheduled Date: ${dateLabel}\n\n` +
+    `My preferred new date is: `
   );
   // escapeHtml_ turns the "&" between subject and body into &amp;, which is
   // the correct way to write it inside an href attribute.
