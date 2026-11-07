@@ -11,9 +11,9 @@
 // =====================================================================
 
 var REMINDER_CONFIG = {
-  // Optional. When a devotee replies to the reminder, the reply goes here.
-  // Leave "" to let replies go to the sending Google account instead.
-  REPLY_TO_EMAIL: 'shreechamatkarikdham@gmail.com',
+  // The one contact address used everywhere: reply-to, the "Request Date
+  // Change" button, the email footer and the plain-text version.
+  CONTACT_EMAIL: 'shreechamatkarikdham@gmail.com',
   SENDER_NAME: 'Shree Chamatkarik Dham',
   // Leave "" to use the same sheet Code.gs uses (getActiveSheet()).
   SHEET_NAME: '',
@@ -156,9 +156,7 @@ function sendDevoteeEmail_(booking, dateLabel) {
     htmlBody: buildReminderHtml_(booking, dateLabel),
   };
 
-  if (REMINDER_CONFIG.REPLY_TO_EMAIL) {
-    options.replyTo = REMINDER_CONFIG.REPLY_TO_EMAIL;
-  }
+  options.replyTo = REMINDER_CONFIG.CONTACT_EMAIL;
 
   MailApp.sendEmail(options);
 }
@@ -175,14 +173,15 @@ function buildReminderText_(booking, dateLabel) {
     'YOUR SEVA DETAILS',
     'Seva Date: ' + dateLabel,
     'Seva Type: ' + booking.seva,
-    'Reporting Time: ' + REMINDER_CONFIG.REPORTING_TIME,
     'Location: ' + REMINDER_CONFIG.VENUE,
     '',
     'Please arrive on time for your seva.',
     '',
     'Instagram: ' + REMINDER_CONFIG.INSTAGRAM_URL,
     '',
-    'For any queries or changes, please reply to this email.',
+    'For any queries or date changes, please reply to this email or write to ' +
+      REMINDER_CONFIG.CONTACT_EMAIL +
+      '.',
     '',
     'Jai Hanumanji Maharaj!',
     'Shree Chamatkarik Dham',
@@ -197,11 +196,28 @@ function buildReminderHtml_(booking, dateLabel) {
   var date = escapeHtml_(dateLabel);
   var seva = escapeHtml_(booking.seva);
   var venue = escapeHtml_(REMINDER_CONFIG.VENUE);
+  var contactEmail = escapeHtml_(REMINDER_CONFIG.CONTACT_EMAIL);
 
   var insta = REMINDER_CONFIG.INSTAGRAM_URL;
   var logo = REMINDER_CONFIG.LOGO_URL;
 
   var mapsUrl = 'https://maps.app.goo.gl/4ysJ5XQeTw3BEwF27?g_st=ac';
+
+  // "Request Date Change" button: opens the devotee's mail app with a
+  // pre-filled reschedule request addressed to the temple.
+  var helpEmail = REMINDER_CONFIG.CONTACT_EMAIL;
+  var rescheduleSubject = encodeURIComponent(
+    `Reschedule Request: ${booking.seva} (${booking.name})`,
+  );
+  var rescheduleBody = encodeURIComponent(
+    `Jai Siyaram,\n\nI need to change my ${booking.seva} date currently scheduled for ${dateLabel}.\n\nMy preferred new date is: \nReason (optional): \n\nDevotee Name: ${booking.name}`,
+  );
+  // escapeHtml_ turns the "&" between subject and body into &amp;, which is
+  // the correct way to write it inside an href attribute.
+  var rescheduleUrl = escapeHtml_(
+    `mailto:${helpEmail}?subject=${rescheduleSubject}&body=${rescheduleBody}`,
+  );
+
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -428,6 +444,16 @@ function buildReminderHtml_(booking, dateLabel) {
                     </a>
                   </td>
                 </tr>
+
+                <tr>
+                  <td colspan="2" align="center" style="padding:5px;">
+                    <a href="${rescheduleUrl}"
+                    style="display:block;background:#ffffff;color:#c45b18;text-decoration:none;font-size:14px;font-weight:bold;padding:14px 20px;border:1px solid #f36b0b;border-radius:7px;text-align:center;">
+                    Request Date Change
+                    </a>
+                  </td>
+                </tr>
+
               </table>
 
             </td>
@@ -478,12 +504,16 @@ function buildReminderHtml_(booking, dateLabel) {
                 📍 Rajkot, Gujarat, India
               </div>
 
+              <div style="font-size:13px;line-height:23px;color:#666666;">
+                ✉️ <a href="mailto:${contactEmail}" style="color:#c45b18;text-decoration:none;">${contactEmail}</a>
+              </div>
+
               <div style="margin-top:15px;font-size:12px;color:#999999;">
                 © 2026 Shree Chamatkarik Dham. All rights reserved.
               </div>
 
               <div style="margin-top:8px;font-size:11px;color:#aaaaaa;">
-                This is an automated Vagha Seva reminder email.
+                This is an official system-generated Seva communication from Shree Chamatkarik Dham.
               </div>
 
             </td>
