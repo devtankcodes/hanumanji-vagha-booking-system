@@ -18,6 +18,15 @@
   <title>Vagha Management System</title>
   <link rel="icon" type="image/png" href="frontend/assets/logo.png" />
 
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#d66a0a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Vagha" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="apple-touch-icon" href="frontend/assets/logo.png" />
+
   <!-- Third-party CSS first, so our own stylesheets can override it -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 
@@ -268,6 +277,7 @@
     await import('./frontend/js/main.js');
   </script>
 
+  <script src="frontend/js/pwa.js"></script>
 </body>
 
 </html>

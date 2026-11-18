@@ -211,10 +211,10 @@ function buildReminderHtml_(booking, dateLabel) {
   );
   var rescheduleBody = encodeURIComponent(
     `Jai Siyaram,\n\nI would like to request a date change for my upcoming Seva.\n\n` +
-    `• Devotee Name: ${booking.name}\n` +
-    `• Seva Type: ${booking.seva}\n` +
-    `• Current Scheduled Date: ${dateLabel}\n\n` +
-    `My preferred new date is: `
+      `• Devotee Name: ${booking.name}\n` +
+      `• Seva Type: ${booking.seva}\n` +
+      `• Current Scheduled Date: ${dateLabel}\n\n` +
+      `My preferred new date is:`,
   );
   // escapeHtml_ turns the "&" between subject and body into &amp;, which is
   // the correct way to write it inside an href attribute.
@@ -232,14 +232,25 @@ function buildReminderHtml_(booking, dateLabel) {
   <title>Vagha Seva Reminder</title>
 
   <style>
-    @media only screen and (max-width:480px) {
+    @media only screen and (max-width:600px) {
+      .outer-wrapper {
+        padding: 0 !important;
+      }
+
+      .main-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+
       .email-header {
-        padding: 16px 12px !important;
+        padding: 20px 16px !important;
       }
 
       .header-logo-cell {
         width: 72px !important;
-        padding: 5px 10px 5px 0 !important;
+        padding: 5px 12px 5px 0 !important;
       }
 
       .header-logo {
@@ -281,21 +292,24 @@ function buildReminderHtml_(booking, dateLabel) {
   </style>
 </head>
 
-<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#292929;">
+<body style="margin:0;padding:0;width:100% !important;-webkit-text-size-adjust:100%;background-color:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#292929;">
 
-  <!-- Preheader -->
-  <div style="display:none;font-size:1px;color:#f4f5f7;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
-    A gentle reminder about your upcoming Vagha Seva.
+  <!-- Preheader with Whitespace Hack -->
+  <div style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+    A gentle reminder about your upcoming Vagha Seva at Shree Chamatkarik Hanumanji Mandir.
+    &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp; &#847; &zwnj; &nbsp;
   </div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-    style="background-color:#f4f5f7;">
+    style="background-color:#ffffff;margin:0;padding:0;width:100%;">
     <tr>
-      <td align="center" style="padding:30px 12px;">
+      <!-- Removed the 30px 12px padding so it spans full width -->
+      <td align="center" class="outer-wrapper" style="padding:0;">
 
-        <!-- Main Container -->
+        <!-- Main Container: Removed border-radius and border for flat edge-to-edge fit -->
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
-          style="width:100%;max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #eeeeee;">
+          class="main-container"
+          style="width:100%;max-width:600px;background:#ffffff;border-collapse:collapse;">
 
           <!-- Header -->
           <tr>
@@ -414,11 +428,9 @@ function buildReminderHtml_(booking, dateLabel) {
                   <td width="60%" align="right" valign="middle"
                     class="details-cell details-value"
                     style="padding:13px 14px;font-size:13px;font-weight:bold;color:#292929;border-top:1px solid #f1e8df;">
-                    <a href="${mapsUrl}"
-                      target="_blank"
-                      style="color:#292929;text-decoration:none;">
-                      ${venue}
-                    </a>
+                  <a href="${mapsUrl}" target="_blank" style="color:#c45b18;text-decoration:underline;">
+                    ${venue} ↗
+                  </a>
                   </td>
                 </tr>
 

@@ -4,10 +4,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#fff7ed" />
 
   <title>Login | Hanumanji Vagha Management</title>
   <link rel="icon" type="image/png" href="frontend/assets/logo.png" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#d66a0a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Vagha" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="apple-touch-icon" href="frontend/assets/logo.png" />
 
   <style>
     :root {
@@ -311,6 +319,7 @@
       }
     }
   </style>
+
 </head>
 
 <body>
@@ -446,6 +455,7 @@
       }
     }
   </script>
+  <script src="frontend/js/pwa.js"></script>
 </body>
 
 </html>

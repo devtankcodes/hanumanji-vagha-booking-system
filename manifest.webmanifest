@@ -1,0 +1,17 @@
+{
+  "name": "Vagha Management System",
+  "short_name": "Vagha",
+  "description": "Vagha booking management for Shree Chamatkarik Dham.",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff7ed",
+  "theme_color": "#d66a0a",
+  "lang": "en",
+  "icons": [
+    { "src": "frontend/assets/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "frontend/assets/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
